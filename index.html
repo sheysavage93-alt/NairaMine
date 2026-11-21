@@ -4,21 +4,94 @@
 <title>NairaMine - Earn in Naira</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{font-family:Arial;background:#0a0f1e;color:white;text-align:center;padding:40px 20px}
+body{font-family:Arial;background:#0a0f1e;color:white;text-align:center;padding:40px 20px;margin:0}
 h1{font-size:38px;color:#00ff88}
 p{font-size:18px;line-height:1.6}
-button{background:#00ff88;border:none;padding:15px 30px;font-size:18px;border-radius:10px;font-weight:bold}
+button{background:#00ff88;border:none;padding:15px 30px;font-size:18px;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;max-width:400px}
 .card{background:#131a2e;padding:20px;border-radius:15px;margin:20px auto;max-width:400px}
+input{width:100%;max-width:400px;padding:14px;margin:8px 0;border-radius:10px;border:none;font-size:16px;box-sizing:border-box}
+.link{color:#00ff88;cursor:pointer;text-decoration:underline}
+.hidden{display:none}
+.small{font-size:14px;color:#aaa}
 </style>
 </head>
 <body>
+
+<!-- HOME PAGE -->
+<div id="home">
 <h1>⛏️ NairaMine</h1>
 <p>Mine. Earn. Cash out in Naira.</p>
 <div class="card">
 <h2>Welcome to NairaMine</h2>
 <p>Start mining and grow your Naira balance daily.</p>
-<button>Start Mining Now</button>
+<button onclick="showAuth()">Start Mining Now</button>
 </div>
 <p>Join thousands of Nigerians earning with NairaMine.</p>
+</div>
+
+<!-- AUTH PAGE -->
+<div id="auth" class="hidden">
+<h1>⛏️ NairaMine</h1>
+<div class="card">
+<h2 id="authTitle">Create Account</h2>
+<input type="text" id="name" placeholder="Full Name">
+<input type="email" id="email" placeholder="Email Address">
+<input type="password" id="password" placeholder="Password">
+<button onclick="signup()" id="authBtn">Sign Up</button>
+<p class="small" id="msg"></p>
+<p><span id="toggleText">Already have account?</span> <span class="link" onclick="toggleAuth()" id="toggleLink">Login</span></p>
+<p><span class="link" onclick="showHome()">← Back to Home</span></p>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash" class="hidden">
+<h1>⛏️ NairaMine</h1>
+<div class="card">
+<h2>Welcome, <span id="userName"></span> 👋</h2>
+<p>Your Balance</p>
+<h1 style="font-size:50px;margin:10px 0">₦<span id="balance">0</span></h1>
+<p class="small">Keep mining to grow your balance</p>
+<button onclick="logout()">Logout</button>
+</div>
+</div>
+
+<script>
+let isLogin = false;
+function showAuth(){document.getElementById('home').classList.add('hidden');document.getElementById('dash').classList.add('hidden');document.getElementById('auth').classList.remove('hidden');}
+function showHome(){document.getElementById('auth').classList.add('hidden');document.getElementById('dash').classList.add('hidden');document.getElementById('home').classList.remove('hidden');}
+function toggleAuth(){
+  isLogin = !isLogin;
+  document.getElementById('authTitle').innerText = isLogin ? 'Login' : 'Create Account';
+  document.getElementById('authBtn').innerText = isLogin ? 'Login' : 'Sign Up';
+  document.getElementById('toggleText').innerText = isLogin ? 'No account yet?' : 'Already have account?';
+  document.getElementById('toggleLink').innerText = isLogin ? 'Sign Up' : 'Login';
+  document.getElementById('name').style.display = isLogin ? 'none' : 'block';
+}
+function signup(){
+  let name=document.getElementById('name').value;
+  let email=document.getElementById('email').value;
+  let pass=document.getElementById('password').value;
+  let msg=document.getElementById('msg');
+  if(!email || !pass){msg.innerText='Please fill email and password';return;}
+  if(isLogin){
+    let saved = JSON.parse(localStorage.getItem('user')||'{}');
+    if(saved.email===email && saved.pass===pass){
+      showDash(saved.name);
+    } else { msg.innerText='Wrong email or password'; }
+  } else {
+    if(!name){msg.innerText='Please enter your name';return;}
+    localStorage.setItem('user', JSON.stringify({name:name,email:email,pass:pass}));
+    showDash(name);
+  }
+}
+function showDash(name){
+  document.getElementById('auth').classList.add('hidden');
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('dash').classList.remove('hidden');
+  document.getElementById('userName').innerText = name;
+}
+function logout(){showHome();}
+</script>
 </body>
 </html>
