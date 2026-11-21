@@ -1,0 +1,11 @@
+.token.txt
+*.db
+*.log
+__pycache__/
+bot.py.bak
+fix.py
+fix2.py
+fix3.py
+fix4.py
+patch.py
+patch2.py
