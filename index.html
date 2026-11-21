@@ -1,96 +1,135 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <title>NairaMine - Earn in Naira</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{font-family:Arial;background:#0a0f1e;color:white;text-align:center;padding:40px 20px;margin:0}
-h1{font-size:38px;color:#00ff88}
-p{font-size:18px;line-height:1.6}
-button{background:#00ff88;border:none;padding:15px 30px;font-size:18px;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;max-width:400px}
-.card{background:#131a2e;padding:20px;border-radius:15px;margin:20px auto;max-width:400px}
-input{width:100%;max-width:400px;padding:14px;margin:8px 0;border-radius:10px;border:none;font-size:16px;box-sizing:border-box}
+body{font-family:Arial;background:#0a0f1e;color:white;text-align:center;padding:20px;margin:0}
+h1{font-size:32px;color:#00ff88}
+button{background:#00ff88;border:none;padding:14px;font-size:16px;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;max-width:400px;margin:5px 0}
+button.secondary{background:#2a3555;color:white}
+button:disabled{background:#555;color:#aaa}
+.card{background:#131a2e;padding:18px;border-radius:15px;margin:15px auto;max-width:430px;text-align:left}
+.center{text-align:center}
+input{width:100%;padding:13px;margin:8px 0;border-radius:10px;border:none;font-size:16px;box-sizing:border-box}
 .link{color:#00ff88;cursor:pointer;text-decoration:underline}
 .hidden{display:none}
 .small{font-size:14px;color:#aaa}
+.balance{font-size:44px;color:#00ff88;text-align:center;margin:5px 0}
+.vip{border:2px solid #2a3555;padding:12px;border-radius:12px;margin:8px 0}
+.vip.active{border-color:#00ff88;background:#1a2f25}
+.task{display:flex;justify-content:space-between;align-items:center;background:#1e2a4a;padding:12px;border-radius:10px;margin:8px 0}
+.task button{width:90px;padding:8px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th,td{border:1px solid #2a3555;padding:7px;text-align:left}
+th{background:#1e2a4a;color:#00ff88}
 </style>
 </head>
 <body>
 
-<!-- HOME PAGE -->
 <div id="home">
 <h1>⛏️ NairaMine</h1>
 <p>Mine. Earn. Cash out in Naira.</p>
-<div class="card">
-<h2>Welcome to NairaMine</h2>
-<p>Start mining and grow your Naira balance daily.</p>
-<button onclick="showAuth()">Start Mining Now</button>
-</div>
-<p>Join thousands of Nigerians earning with NairaMine.</p>
+<div class="card center"><h2>Welcome to NairaMine</h2><p>Mine every 4 hours. Do tasks, refer friends, go VIP. Min Withdrawal ₦5,000.</p><button onclick="showAuth()">Start Mining Now</button></div>
+<div class="card"><h3>💰 How You Earn in 15 Days</h3><p class="small">Mining + Tasks ₦525 + Referral (only when friend buys VIP). FREE total = ₦975 - cannot withdraw alone.</p></div>
 </div>
 
-<!-- AUTH PAGE -->
 <div id="auth" class="hidden">
 <h1>⛏️ NairaMine</h1>
-<div class="card">
-<h2 id="authTitle">Create Account</h2>
-<input type="text" id="name" placeholder="Full Name">
-<input type="email" id="email" placeholder="Email Address">
-<input type="password" id="password" placeholder="Password">
-<button onclick="signup()" id="authBtn">Sign Up</button>
-<p class="small" id="msg"></p>
-<p><span id="toggleText">Already have account?</span> <span class="link" onclick="toggleAuth()" id="toggleLink">Login</span></p>
-<p><span class="link" onclick="showHome()">← Back to Home</span></p>
-</div>
+<div class="card center"><h2 id="authTitle">Create Account</h2><input id="name" placeholder="Full Name"><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button onclick="signup()" id="authBtn">Sign Up</button><p class="small" id="msg"></p><p><span id="toggleText">Already have account?</span> <span class="link" onclick="toggleAuth()" id="toggleLink">Login</span></p><p><span class="link" onclick="showHome()">← Back</span></p></div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dash" class="hidden">
 <h1>⛏️ NairaMine</h1>
-<div class="card">
+<div class="card center">
 <h2>Welcome, <span id="userName"></span> 👋</h2>
-<p>Your Balance</p>
-<h1 style="font-size:50px;margin:10px 0">₦<span id="balance">0</span></h1>
-<p class="small">Keep mining to grow your balance</p>
-<button onclick="logout()">Logout</button>
+<p>Your Balance</p><div class="balance">₦<span id="balance">0</span></div>
+<p class="small">Plan: <b id="planName">FREE</b> | <span id="mineInfo"></span> | Referral: <b id="refRate">₦100</b> per boosted friend</p>
+<button onclick="mine()" id="mineBtn">⛏️ Mine Now</button>
+<p class="small" id="timer"></p>
+<button onclick="withdraw()" class="secondary">💰 Withdraw (Min ₦5,000)</button>
+<p class="small" id="withdrawMsg"></p>
+</div>
+
+<div class="card">
+<h3>💎 VIP PLANS - 15 Days</h3>
+<p class="small">Higher plan = Higher profit. Profit = Mining + Tasks ₦525 - Price.</p>
+<div class="vip active" id="vip-free"><b>🆓 FREE - 30/day</b><br><span class="small">5 per mine, every 4 hours. Mining ₦450 + Tasks ₦525 = ₦975 total. Profit ₦975</span><br><button class="secondary" onclick="setPlan('FREE',5)">Current Plan</button></div>
+<div class="vip" id="vip-bronze"><b>🥉 Bronze - ₦4,000</b><br><span class="small">50 per mine = 300/day. Mining ₦4,500 + Tasks ₦525 = ₦5,025 total. Profit ₦1,025</span><br><button onclick="setPlan('Bronze',50)">Buy Bronze</button></div>
+<div class="vip" id="vip-silver"><b>🥈 Silver - ₦5,000</b><br><span class="small">65 per mine = 390/day. Mining ₦5,850 + Tasks ₦525 = ₦6,375 total. Profit ₦1,375</span><br><button onclick="setPlan('Silver',65)">Buy Silver</button></div>
+<div class="vip" id="vip-gold"><b>🥇 Gold - ₦6,000</b><br><span class="small">85 per mine = 510/day. Mining ₦7,650 + Tasks ₦525 = ₦8,175 total. Profit ₦2,175</span><br><button onclick="setPlan('Gold',85)">Buy Gold</button></div>
+<div class="vip" id="vip-platinum"><b>💎 Platinum - ₦10,000</b><br><span class="small">150 per mine = 900/day. Mining ₦13,500 + Tasks ₦525 = ₦14,025 total. Profit ₦4,025</span><br><button onclick="setPlan('Platinum',150)">Buy Platinum</button></div>
+<div class="vip" id="vip-diamond"><b>👑 Diamond - ₦15,000</b><br><span class="small">250 per mine = 1,500/day. Mining ₦22,500 + Tasks ₦525 = ₦23,025 total. Profit ₦8,025</span><br><button onclick="setPlan('Diamond',250)">Buy Diamond</button></div>
+<p class="small">To buy, send payment and send screenshot to admin.</p>
+</div>
+
+<div class="card">
+<h3>📋 DAILY TASKS - 35/day</h3>
+<div class="task"><span>✅ Check-in: 10</span><button onclick="doTask('checkin',10,this)">Claim</button></div>
+<div class="task"><span>✅ Watch Ads: 15</span><button onclick="doTask('ads',15,this)">Claim</button></div>
+<div class="task"><span>✅ Stay in Channel: 10</span><button onclick="doTask('channel',10,this)">Claim</button></div>
+<p class="small">Total: 35/day = ₦245/week = ₦525 in 15 days = ₦1,050 in 30 days. Tasks reset daily. Same for all plans.</p>
+</div>
+
+<div class="card center">
+<h3>👥 Refer & Earn - Only When Friend Boosts</h3>
+<p class="small"><b>⚠️ If your friend stays FREE, you get ₦0. You only earn when your friend buys VIP / boosts.</b></p>
+<table>
+<tr><th>Your Plan</th><th>Per Boosted Friend</th></tr>
+<tr><td>🆓 FREE</td><td>₦100</td></tr>
+<tr><td>🥉 Bronze</td><td>₦200</td></tr>
+<tr><td>🥈 Silver</td><td>₦250</td></tr>
+<tr><td>🥇 Gold</td><td>₦300</td></tr>
+<tr><td>💎 Platinum</td><td>₦400</td></tr>
+<tr><td>👑 Diamond</td><td>₦500</td></tr>
+</table>
+<p class="small">Example: You are Gold, you invite 10 friends, 3 boost = 3 x ₦300 = ₦900. 7 FREE friends = ₦0.</p>
+<input id="refLink" readonly>
+<button onclick="copyRef()" class="secondary">Copy Refer Link</button>
+<p class="small" id="refMsg"></p>
+<button onclick="logout()" class="secondary">Logout</button>
+</div>
+
+<div class="card">
+<h3>📊 COMPLETE PROFIT IN 15 DAYS</h3>
+<table>
+<tr><th>Plan</th><th>No Referral</th><th>+5 Boosted</th><th>+10 Boosted</th></tr>
+<tr><td>FREE</td><td>₦975</td><td>₦1,475</td><td>₦1,975</td></tr>
+<tr><td>Bronze</td><td>₦1,025</td><td>₦2,025</td><td>₦3,025</td></tr>
+<tr><td>Silver</td><td>₦1,375</td><td>₦2,625</td><td>₦3,875</td></tr>
+<tr><td>Gold</td><td>₦2,175</td><td>₦3,675</td><td>₦5,175</td></tr>
+<tr><td>Platinum</td><td>₦4,025</td><td>₦6,025</td><td>₦8,025</td></tr>
+<tr><td>Diamond</td><td>₦8,025</td><td>₦10,525</td><td>₦13,025</td></tr>
+</table>
+<p class="small">Total Profit = Mining Profit + ₦525 Tasks + (Your Referral Price x Boosted Friends). Min Withdrawal ₦5,000.</p>
 </div>
 </div>
 
 <script>
-let isLogin = false;
-function showAuth(){document.getElementById('home').classList.add('hidden');document.getElementById('dash').classList.add('hidden');document.getElementById('auth').classList.remove('hidden');}
-function showHome(){document.getElementById('auth').classList.add('hidden');document.getElementById('dash').classList.add('hidden');document.getElementById('home').classList.remove('hidden');}
-function toggleAuth(){
-  isLogin = !isLogin;
-  document.getElementById('authTitle').innerText = isLogin ? 'Login' : 'Create Account';
-  document.getElementById('authBtn').innerText = isLogin ? 'Login' : 'Sign Up';
-  document.getElementById('toggleText').innerText = isLogin ? 'No account yet?' : 'Already have account?';
-  document.getElementById('toggleLink').innerText = isLogin ? 'Sign Up' : 'Login';
-  document.getElementById('name').style.display = isLogin ? 'none' : 'block';
-}
-function signup(){
-  let name=document.getElementById('name').value;
-  let email=document.getElementById('email').value;
-  let pass=document.getElementById('password').value;
-  let msg=document.getElementById('msg');
-  if(!email || !pass){msg.innerText='Please fill email and password';return;}
-  if(isLogin){
-    let saved = JSON.parse(localStorage.getItem('user')||'{}');
-    if(saved.email===email && saved.pass===pass){
-      showDash(saved.name);
-    } else { msg.innerText='Wrong email or password'; }
-  } else {
-    if(!name){msg.innerText='Please enter your name';return;}
-    localStorage.setItem('user', JSON.stringify({name:name,email:email,pass:pass}));
-    showDash(name);
-  }
-}
-function showDash(name){
-  document.getElementById('auth').classList.add('hidden');
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('dash').classList.remove('hidden');
-  document.getElementById('userName').innerText = name;
-}
+let isLogin=false;
+let balance=parseInt(localStorage.getItem('balance')||'0');
+let plan=localStorage.getItem('plan')||'FREE';
+let mineAmount=parseInt(localStorage.getItem('mineAmount')||'5');
+let lastMine=parseInt(localStorage.getItem('lastMine')||'0');
+let tasksDone=JSON.parse(localStorage.getItem('tasksDone')||'{}');
+let today=new Date().toDateString();
+if(localStorage.getItem('taskDay')!==today){tasksDone={};localStorage.setItem('taskDay',today);}
+let refRates={'FREE':100,'Bronze':200,'Silver':250,'Gold':300,'Platinum':400,'Diamond':500};
+function showAuth(){hideAll();document.getElementById('auth').classList.remove('hidden');}
+function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');}
+function hideAll(){['home','auth','dash'].forEach(id=>document.getElementById(id).classList.add('hidden'))}
+function toggleAuth(){isLogin=!isLogin;document.getElementById('authTitle').innerText=isLogin?'Login':'Create Account';document.getElementById('authBtn').innerText=isLogin?'Login':'Sign Up';document.getElementById('toggleText').innerText=isLogin?'No account yet?':'Already have account?';document.getElementById('toggleLink').innerText=isLogin?'Sign Up':'Login';document.getElementById('name').style.display=isLogin?'none':'block';}
+function signup(){let name=document.getElementById('name').value;let email=document.getElementById('email').value;let pass=document.getElementById('password').value;let msg=document.getElementById('msg');if(!email||!pass){msg.innerText='Fill email and password';return;}if(isLogin){let s=JSON.parse(localStorage.getItem('user')||'{}');if(s.email===email&&s.pass===pass)showDash(s.name);else msg.innerText='Wrong email or password';}else{if(!name){msg.innerText='Enter your name';return;}localStorage.setItem('user',JSON.stringify({name:name,email:email,pass:pass}));showDash(name);}}
+function showDash(name){hideAll();document.getElementById('dash').classList.remove('hidden');document.getElementById('userName').innerText=name;document.getElementById('refLink').value='https://nairamine.onrender.com/?ref='+encodeURIComponent(name.replace(/\s/g,''));updateUI();setInterval(updateTimer,1000);}
+function updateUI(){document.getElementById('balance').innerText=balance.toLocaleString();document.getElementById('planName').innerText=plan;document.getElementById('mineInfo').innerText=mineAmount+' per mine';document.getElementById('refRate').innerText='₦'+(refRates[plan]||100);localStorage.setItem('balance',balance);['free','bronze','silver','gold','platinum','diamond'].forEach(p=>{let el=document.getElementById('vip-'+p);if(el)el.classList.remove('active')});let active=document.getElementById('vip-'+plan.toLowerCase());if(active)active.classList.add('active');}
+function mine(){let now=Date.now();let diff=now-lastMine;if(diff<4*60*60*1000&&lastMine!==0){alert('Wait! You can mine again in '+formatTime(4*60*60*1000-diff));return;}balance+=mineAmount;lastMine=now;localStorage.setItem('lastMine',lastMine);updateUI();alert('✅ You mined ₦'+mineAmount+'! Balance: ₦'+balance);}
+function formatTime(ms){let h=Math.floor(ms/3600000);let m=Math.floor((ms%3600000)/60000);let s=Math.floor((ms%60000)/1000);return h+'h '+m+'m '+s+'s';}
+function updateTimer(){let now=Date.now();let remain=4*60*60*1000-(now-lastMine);let btn=document.getElementById('mineBtn');let t=document.getElementById('timer');if(lastMine===0||remain<=0){btn.disabled=false;btn.innerText='⛏️ Mine Now - ₦'+mineAmount;t.innerText='Ready to mine!';}else{btn.disabled=true;btn.innerText='⏳ Mining Locked';t.innerText='Next mine in: '+formatTime(remain);}}
+function setPlan(p,amt){if(p==='FREE'){plan=p;mineAmount=amt;}else{if(!confirm('To buy '+p+' - Send payment and send screenshot to admin. Tap OK to activate demo?'))return;plan=p;mineAmount=amt;}localStorage.setItem('plan',plan);localStorage.setItem('mineAmount',mineAmount);updateUI();alert('Plan changed to '+p+' - '+mineAmount+' per mine. Referral now ₦'+refRates[p]+' per boosted friend.');}
+function doTask(key,amt,btn){if(tasksDone[key]){alert('Already claimed today');return;}tasksDone[key]=true;localStorage.setItem('tasksDone',JSON.stringify(tasksDone));balance+=amt;updateUI();btn.innerText='Done ✓';btn.disabled=true;alert('✅ +₦'+amt+' Task done!');}
+function withdraw(){let msg=document.getElementById('withdrawMsg');if(balance<5000){msg.innerText='❌ Minimum withdrawal is ₦5,000. Your balance: ₦'+balance.toLocaleString()+'. Keep mining!';}else{msg.innerText='✅ Withdraw request sent! Admin will contact you. Balance: ₦'+balance.toLocaleString();}}
+function copyRef(){let i=document.getElementById('refLink');i.select();document.execCommand('copy');document.getElementById('refMsg').innerText='Link copied! You earn only when friend buys VIP.';}
 function logout(){showHome();}
 </script>
 </body>
