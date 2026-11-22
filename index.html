@@ -1,251 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NairaMine - Earn Points Daily</title>
+<title>NairaMine - Mine. Earn. Cash out in Naira.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#f0f2f5;padding-bottom:80px}
-.header{background:#00a651;color:#fff;padding:20px;text-align:center}
-.header h1{font-size:28px}
-.balance{background:#fff;margin:15px;border-radius:15px;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-.balance h2{font-size:14px;color:#666}
-.balance .amount{font-size:36px;font-weight:bold;color:#00a651;margin:8px 0}
-.balance p{font-size:12px;color:#888}
-.card{background:#fff;margin:15px;border-radius:15px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-.card h3{margin-bottom:8px}
-.card p{font-size:13px;color:#666;margin-bottom:12px}
-button{width:100%;padding:13px;border:none;border-radius:10px;background:#00a651;color:#fff;font-size:16px;font-weight:bold;cursor:pointer}
-button:disabled{background:#ccc;cursor:not-allowed}
-.progress{height:10px;background:#eee;border-radius:10px;overflow:hidden;margin:10px 0}
-.progress div{height:100%;background:#00a651;width:0%;transition:width 1s}
-.timer{font-weight:bold;text-align:center;margin:8px 0;color:#333}
-input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:10px;font-size:15px}
-.small{font-size:12px;color:#888;margin-top:8px;text-align:center}
-.telegram{background:#0088cc}
+body{font-family:Arial;background:#0a0f1e;color:white;text-align:center;padding:20px;margin:0}
+h1{font-size:32px;color:#00ff88}
+button{background:#00ff88;border:none;padding:14px;font-size:16px;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;max-width:430px;margin:5px 0;color:#000}
+button.secondary{background:#2a3555;color:white}
+button:disabled{background:#555;color:#aaa}
+.card{background:#131a2e;padding:18px;border-radius:15px;margin:15px auto;max-width:430px;text-align:left}
+.center{text-align:center}
+input,select{width:100%;padding:13px;margin:8px 0;border-radius:10px;border:none;font-size:16px;box-sizing:border-box}
+.link{color:#00ff88;cursor:pointer;text-decoration:underline}
+.hidden{display:none}
+.small{font-size:13px;color:#aaa;line-height:1.5}
+.balance{font-size:44px;color:#00ff88;text-align:center;margin:5px 0}
+.vip{border:2px solid #2a3555;padding:12px;border-radius:12px;margin:8px 0}
+.vip.active{border-color:#00ff88;background:#1a2f25}
+.task{display:flex;justify-content:space-between;align-items:center;background:#1e2a4a;padding:12px;border-radius:10px;margin:8px 0}
+.task button{width:90px;padding:8px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th,td{border:1px solid #2a3555;padding:7px;text-align:left}
+th{background:#1e2a4a;color:#00ff88}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>💰 NairaMine</h1>
-  <p>Complete Tasks - Earn Points Daily</p>
+<div id="home">
+<h1>⛏️ NairaMine</h1>
+<p>Mine. Earn. Cash out in Naira.</p>
+<div class="card center"><h2>Welcome to NairaMine</h2><p>Mine every 4 hours. Do tasks, refer friends, go VIP. Min Withdrawal ₦5,000 after 15 days.</p><button onclick="showAuth()">Start Mining Now</button></div>
+<div class="card"><h3>💰 How You Earn in 15 Days</h3><p class="small">Mining + Tasks ₦525 + Referral (only when friend buys VIP). FREE mining + tasks = ₦975 - cannot withdraw alone. Earnings depend on completing tasks and manual verification.</p></div>
 </div>
 
-<div class="balance">
-  <h2>YOUR BALANCE</h2>
-  <div class="amount">₦<span id="balance">0</span></div>
-  <p>Min Withdrawal: ₦500 | Withdrawal Day: Saturday</p>
+<div id="auth" class="hidden">
+<h1>⛏️ NairaMine</h1>
+<div class="card center"><h2 id="authTitle">Create Account</h2><input id="name" placeholder="Full Name"><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button onclick="signup()" id="authBtn">Sign Up</button><p class="small" id="msg"></p><p><span id="toggleText">Already have account?</span> <span class="link" onclick="toggleAuth()" id="toggleLink">Login</span></p><p><span class="link" onclick="showHome()">← Back</span></p></div>
 </div>
 
-<!-- TASK 1: STAY IN PAGE 10 SECONDS -->
+<div id="dash" class="hidden">
+<h1>⛏️ NairaMine</h1>
+<div class="card center">
+<h2>Welcome, <span id="userName"></span> 👋</h2>
+<p>Your Balance</p><div class="balance">₦<span id="balance">0</span></div>
+<p class="small">Plan: <b id="planName">FREE</b> | <span id="mineInfo"></span> | Referral: <b id="refRate">₦100</b> per boosted friend | <span id="daysLeftMsg"></span></p>
+<button onclick="mine()" id="mineBtn">⛏️ Mine Now</button>
+<p class="small" id="timer"></p>
+</div>
+
 <div class="card">
-  <h3>⏱️ Stay In Page - Earn ₦10</h3>
-  <p>Stay on this page for 10 seconds. Don't close or switch app. Timer must finish.</p>
-  <div class="progress"><div id="stayBar"></div></div>
-  <div class="timer" id="stayTimer">10 seconds remaining</div>
-  <button id="stayBtn" disabled>Wait 10 Seconds...</button>
-  <p class="small" id="stayStatus">Timer started automatically. Keep this page open.</p>
+<h3>💎 VIP PLANS - 15 Days - Optional</h3>
+<p class="small">VIP is OPTIONAL. Higher plan = higher mining rate. Example profit = Mining + Tasks ₦525 - Price.</p>
+<div class="vip active" id="vip-free"><b>🆓 FREE - 5 per mine</b><br><span class="small">30/day. Mining ₦450 + Tasks ₦525 = ₦975 total in 15 days.</span><br><button class="secondary" onclick="setPlan('FREE',5)">Current Plan</button></div>
+<div class="vip" id="vip-bronze"><b>🥉 Bronze - ₦4,000 - 50 per mine</b><br><span class="small">300/day. Mining ₦4,500 + Tasks ₦525 = ₦5,025 total. Example profit ₦1,025</span><br><button onclick="buyVip('Bronze',50,4000)">Buy Bronze</button></div>
+<div class="vip" id="vip-silver"><b>🥈 Silver - ₦5,000 - 65 per mine</b><br><span class="small">390/day. Mining ₦5,850 + Tasks ₦525 = ₦6,375 total. Example profit ₦1,375</span><br><button onclick="buyVip('Silver',65,5000)">Buy Silver</button></div>
+<div class="vip" id="vip-gold"><b>🥇 Gold - ₦6,000 - 85 per mine</b><br><span class="small">510/day. Mining ₦7,650 + Tasks ₦525 = ₦8,175 total. Example profit ₦2,175</span><br><button onclick="buyVip('Gold',85,6000)">Buy Gold</button></div>
+<div class="vip" id="vip-platinum"><b>💎 Platinum - ₦10,000 - 150 per mine</b><br><span class="small">900/day. Mining ₦13,500 + Tasks ₦525 = ₦14,025 total. Example profit ₦4,025</span><br><button onclick="buyVip('Platinum',150,10000)">Buy Platinum</button></div>
+<div class="vip" id="vip-diamond"><b>👑 Diamond - ₦15,000 - 250 per mine</b><br><span class="small">1,500/day. Mining ₦22,500 + Tasks ₦525 = ₦23,025 total. Example profit ₦8,025</span><br><button onclick="buyVip('Diamond',250,15000)">Buy Diamond</button></div>
+<p class="small">To buy VIP / Boost: Message admin on WhatsApp <b>09158978606</b> to get account number. Pay, then send proof below. Admin verifies manually before activating.</p>
+<a href="https://wa.me/2349158978606?text=Hello%20NairaMine%20Admin%2C%20I%20want%20to%20buy%20VIP%20%2F%20Boost.%20Please%20send%20me%20the%20account%20number." target="_blank" style="text-decoration:none"><button>Get Account Number on WhatsApp - 09158978606</button></a>
 </div>
 
-<!-- TASK 2: WATCH VIDEOS / ADS -->
 <div class="card">
-  <h3>📺 Watch Videos - Earn ₦15</h3>
-  <p>Tap Watch Videos, wait for video/ad to load, then come back and tap "I Watched".</p>
-  <a href="https://araplhn.org/4/cb98cb8e497cb7eecc4dd44213d4b012" target="_blank" style="text-decoration:none">
-    <button style="background:#ff9800">▶ Watch Videos</button>
-  </a>
-  <br><br>
-  <button onclick="claimWatch()" id="watchBtn">I Watched - Claim ₦15</button>
-  <p class="small">You can claim Watch Videos once every 30 minutes.</p>
+<h3>📋 DAILY TASKS - ₦35/day - With Links</h3>
+<div class="task"><span>✅ Check-in: ₦10</span><button onclick="doTask('checkin',10,this)">Claim</button></div>
+<div class="task"><span>📺 Watch Ads: ₦15</span><span><a href="https://araplhn.org/4/cb98cb8e497cb7eecc4dd44213d4b012" target="_blank" style="background:#f59e0b;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Watch</a> <button onclick="doTask('ads',15,this)" style="margin-left:4px;">Claim</button></span></div>
+<div class="task"><span>📢 Stay in Channel: ₦10</span><span><a href="https://t.me/NairaMineUpdates" target="_blank" style="background:#3b82f6;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Join</a> <button onclick="doTask('channel',10,this)" style="margin-left:4px;">Claim</button></span></div>
+<p class="small">Total: 35/day = ₦525 in 15 days. Tasks reset daily. Same for all plans.</p>
+<a href="https://t.me/NairaMineUpdates" target="_blank" style="text-decoration:none"><button class="secondary">Join Telegram Channel - https://t.me/NairaMineUpdates</button></a>
 </div>
 
-<!-- TASK 3: CHECK-IN WITH TELEGRAM -->
+<div class="card center">
+<h3>👥 Refer & Earn - Only When Friend Boosts</h3>
+<p class="small"><b>⚠️ If your friend stays FREE, you get ₦0. You only earn when your friend buys VIP / boosts.</b></p>
+<table><tr><th>Your Plan</th><th>Per Boosted Friend</th></tr><tr><td>🆓 FREE</td><td>₦100</td></tr><tr><td>🥉 Bronze</td><td>₦200</td></tr><tr><td>🥈 Silver</td><td>₦250</td></tr><tr><td>🥇 Gold</td><td>₦300</td></tr><tr><td>💎 Platinum</td><td>₦400</td></tr><tr><td>👑 Diamond</td><td>₦500</td></tr></table>
+<p class="small">Example: You are Gold, you invite 10 friends, 3 boost = 3 x ₦300 = ₦900. 7 FREE friends = ₦0.</p>
+<input id="refLink" readonly>
+<button onclick="copyRef()" class="secondary">Copy Refer Link</button>
+<p class="small" id="refMsg"></p>
+</div>
+
 <div class="card">
-  <h3>✅ Daily Check-in - Earn ₦10</h3>
-  <p>Step 1: Join our Telegram channel. Step 2: Come back and tap Check-in.</p>
-  <a href="https://t.me/NairaMineUpdates" target="_blank" style="text-decoration:none">
-    <button class="telegram" style="margin-bottom:10px;">Join Telegram for Check-in</button>
-  </a>
-  <button onclick="claimCheckin()">Check-in Now - Claim ₦10</button>
-  <p class="small">Check-in link: https://t.me/NairaMineUpdates</p>
+<h3>🧾 Send Proof of Payment - VIP / Boost</h3>
+<p class="small">After you pay for VIP, enter details and send proof to admin on WhatsApp. Admin verifies manually.</p>
+<input type="text" id="proofName" placeholder="Your Name">
+<input type="tel" id="proofAmount" placeholder="Amount Paid e.g. 4000">
+<input type="file" id="proofFile" accept="image/*">
+<button onclick="sendProof()" style="background:#25D366;">Send Proof on WhatsApp - 09158978606</button>
+<p class="small">This opens WhatsApp with your details. You attach your receipt screenshot there. No payment is confirmed automatically.</p>
 </div>
 
-<!-- TELEGRAM -->
-<div class="card">
-  <h3>📢 Join Our Channel</h3>
-  <p>Get payment proofs & updates.</p>
-  <a href="https://t.me/NairaMineUpdates" target="_blank" style="text-decoration:none">
-    <button class="telegram">Join Telegram Channel</button>
-  </a>
-</div>
-
-<!-- BOOST ACCOUNT -->
-<div class="card">
-  <h3>🚀 Boost Your Account - Optional</h3>
-  <p>Boost is optional. It does NOT guarantee earnings and it is NOT required to withdraw your normal earnings.</p>
-  <p style="font-size:14px; margin-bottom:10px;">
-    <b>Boost Plans:</b><br>
-    ₦1,000 Boost - For faster tasks<br>
-    ₦2,000 Boost - For priority support<br>
-    ₦5,000 Boost - For premium tasks
-  </p>
-  <p style="font-size:13px;color:#666;">To get the account number for Boost, message admin on WhatsApp: <b>09158978606</b></p>
-  <a href="https://wa.me/2349158978606?text=Hello%20NairaMine%20Admin%2C%20I%20want%20to%20Boost%20my%20account.%20Please%20send%20me%20the%20account%20number." target="_blank" style="text-decoration:none">
-    <button style="background:#6a00ff">Get Account Number on WhatsApp</button>
-  </a>
-  <p class="small">After you pay, send your proof below. Admin will verify manually.</p>
-</div>
-
-<!-- ADMIN NOTICE -->
-<div class="card" style="border:2px solid #00a651; background:#f0fff5;">
-  <h3>⚠️ Important Notice From Admin</h3>
-  <p style="font-size:14px; line-height:1.6; color:#333;">
-        1. <b>Boost is 100% OPTIONAL.</b><br>
-    You do NOT need to pay for Boost to withdraw your normal earnings.<br><br>
-        2. <b>Normal Withdrawal is Free.</b><br>
-    If you reach ₦500 from Stay, Watch Videos and Check-in, you can request withdrawal without paying anything.<br><br>
-        3. <b>Boost Does Not Guarantee Earnings.</b><br>
-    Boost only gives you access to faster tasks and priority support. It does not double your money.<br><br>
-        4. <b>All Payments Are Verified Manually.</b><br>
-    After you send proof on WhatsApp, admin will check the payment in the bank app before any boost is added.<br><br>
-        5. <b>Do Not Pay Anyone Else.</b><br>
-    Only pay to the account admin sends you on WhatsApp 09158978606. If someone messages you with a different account number, it is a scam.
-  </p>
-</div>
-
-<!-- PROOF OF PAYMENT -->
-<div class="card">
-  <h3>🧾 Send Proof of Payment</h3>
-  <p>After you pay for Boost, enter your details and send proof to admin on WhatsApp for verification.</p>
-  <label>Your Name</label>
-  <input type="text" id="proofName" placeholder="e.g. John Doe">
-  <label>Amount Paid</label>
-  <input type="tel" id="proofAmount" placeholder="e.g. 1000">
-  <label>Upload Receipt Screenshot</label>
-  <input type="file" id="proofFile" accept="image/*">
-  <button onclick="sendProof()" style="background:#25D366">Send Proof on WhatsApp - 09158978606</button>
-  <p class="small">This will open WhatsApp with your details. You will attach the screenshot there. No payment is confirmed automatically.</p>
-</div>
-
-<!-- WITHDRAW -->
-<div class="card">
-  <h3>🏦 Withdraw - Min ₦500</h3>
-  <p><b>How to withdraw on Withdrawal Date:</b><br>
-    1. Reach ₦500 or more.<br>
-    2. Save your OPay / PalmPay / Bank details below.<br>
-    3. Tap Request Withdrawal.<br>
-    4. Withdrawals are paid on <b>Saturday</b> (Withdrawal Date). Requests made before Saturday will be paid on Saturday. Admin will pay within 24 hours of Withdrawal Date.
-  </p>
-  <label>Bank / App Name</label>
-  <select id="bankName">
-    <option>OPay</option>
-    <option>PalmPay</option>
-    <option>Moniepoint</option>
-    <option>Access Bank</option>
-    <option>GTBank</option>
-    <option>First Bank</option>
-    <option>UBA</option>
-    <option>Other Bank</option>
-  </select>
-  <label>Account Number (10 digits)</label>
-  <input type="tel" id="acctNum" placeholder="e.g. 8012345678" maxlength="10">
-  <label>Account Name</label>
-  <input type="text" id="acctName" placeholder="e.g. John Doe">
-  <button onclick="saveAccount()" style="background:#333">Save Account Details</button>
-  <p class="small" id="savedMsg"></p>
-  <br>
-  <button onclick="withdraw()" style="background:#000">Request Withdrawal</button>
-  <p class="small">Withdrawal is manual. Admin will pay on Withdrawal Date (Saturday). Contact admin on Telegram: https://t.me/NairaMineUpdates</p>
-</div>
-
-<script>
-let balance = parseInt(localStorage.getItem('nm_balance') || 0);
-document.getElementById('balance').innerText = balance;
-document.getElementById('acctNum').value = localStorage.getItem('nm_acct') || '';
-document.getElementById('acctName').value = localStorage.getItem('nm_name') || '';
-document.getElementById('bankName').value = localStorage.getItem('nm_bank') || 'OPay';
-function updateBalance(){ document.getElementById('balance').innerText = balance; localStorage.setItem('nm_balance', balance); }
-
-// --- 10 SECOND STAY TASK ---
-let stayTotal = 10;
-let stayLeft = parseInt(localStorage.getItem('nm_stay_left') || stayTotal);
-let stayDoneToday = localStorage.getItem('nm_stay_done') === new Date().toDateString();
-if(stayDoneToday){
-  document.getElementById('stayTimer').innerText = "Done today! Come back tomorrow";
-  document.getElementById('stayBtn').innerText = "Already Claimed Today";
-  document.getElementById('stayBar').style.width = "100%";
-} else {
-  let stayInterval = setInterval(()=>{
-    if(stayLeft <= 0){
-      clearInterval(stayInterval);
-      document.getElementById('stayTimer').innerText = "Time Complete! Claim Now";
-      let btn = document.getElementById('stayBtn');
-      btn.disabled = false;
-      btn.innerText = "Claim ₦10 - Stay Complete";
-      btn.onclick = ()=>{
-        balance += 10; updateBalance();
-        localStorage.setItem('nm_stay_done', new Date().toDateString());
-        alert("₦10 Added! Stay task complete.");
-        btn.disabled = true; btn.innerText = "Claimed Today";
-      };
-      return;
-    }
-    stayLeft--;
-    localStorage.setItem('nm_stay_left', stayLeft);
-    document.getElementById('stayTimer').innerText = stayLeft + " seconds remaining";
-    document.getElementById('stayBar').style.width = ((stayTotal-stayLeft)/stayTotal*100) + "%";
-  }, 1000);
-}
-
-// --- WATCH VIDEOS ---
-function claimWatch(){
-  let last = parseInt(localStorage.getItem('nm_last_watch') || 0);
-  let now = Date.now();
-  if(now - last < 30*60*1000){ alert("Wait 30 mins before next Watch Videos. Come back later."); return; }
-  balance += 15; updateBalance();
-  localStorage.setItem('nm_last_watch', now);
-  alert("₦15 Added! Thanks for watching.");
-}
-
-// --- CHECK-IN ---
-function claimCheckin(){
-  if(localStorage.getItem('nm_checkin') === new Date().toDateString()){ alert("You already checked in today!"); return; }
-  balance += 10; updateBalance();
-  localStorage.setItem('nm_checkin', new Date().toDateString());
-  alert("₦10 Added! Daily Check-in done.");
-}
-
-// --- PROOF OF PAYMENT ---
-function sendProof(){
-  let name = document.getElementById('proofName').value.trim();
-  let amount = document.getElementById('proofAmount').value.trim();
-  if(!name || !amount){ alert("Please enter your name and amount paid"); return; }
-  let msg = "Hello NairaMine Admin, I paid for Boost.%0AName: " + encodeURIComponent(name) + "%0AAmount: ₦" + encodeURIComponent(amount) + "%0AI will attach my receipt screenshot here.";
-  window.open("https://wa.me/2349158978606?text=" + msg, "_blank");
-}
-
-// --- ACCOUNT & WITHDRAW ---
-function saveAccount(){
-  let num = document.getElementById('acctNum').value.trim();
-  let name = document.getElementById('acctName').value.trim();
-  let bank = document.getElementById('bankName').value;
-  if(num.length !== 10){ alert("Account number must be 10 digits!"); return; }
-  if(!name){ alert("Enter your account name!"); return; }
-  localStorage.setItem('nm_acct', num);
-  localStorage.setItem('nm_name', name);
-  localStorage.setItem('nm_bank', bank);
-  document.getElementById('savedMsg').innerText = "Saved: " + bank + " - " + num + " (" + name + ")";
-  alert("Account saved!");
-}
-function withdraw(){
-  let num = document.getElementById('acctNum').value.trim();
-  if(balance < 500){ alert("You need at least ₦500 to withdraw. Balance: ₦"+balance); return; }
-  if(num.length !== 10){ alert("First save your 10-digit account number!"); return; }
-  alert("Withdrawal Request Sent! ₦"+balance+" will be sent to " + document.getElementById('bankName').value + " - " + num + " on Withdrawal Date (Saturday). Contact admin on Telegram.");
-  balance = 0; updateBalance();
-}
-</script>
-</body>
-</html>
+<div class="card" style="border:2px solid #00ff88;">
+<h3>⚠️ Important Notice From Admin</h3>
+<p class="small">1. <b>VIP / Boost is 100% OPTIONAL.</b> You do NOT need to pay to withdraw normal
