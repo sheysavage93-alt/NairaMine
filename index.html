@@ -63,19 +63,19 @@ th{background:#1e2a4a;color:#00ff88}
 <div class="task"><span>✅ Stay in Channel: 10</span><span><a href="https://t.me/NairaMineUpdates" target="_blank" style="background:#3b82f6;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Join</a> <button onclick="doTask('channel',10,this)" style="margin-left:4px;">Claim</button></span></div>
 <p class="small">Total: 35/day = ₦245/week = ₦525 in 15 days = ₦1,050 in 30 days. Tasks reset daily. Same for all plans.</p>
 <a href="https://t.me/NairaMineUpdates" target="_blank" style="text-decoration:none"><button class="secondary">Join Telegram Channel - https://t.me/NairaMineUpdates</button></a>
-                                                                                                                                                              </div><div class="card center">
+</div><div class="card center">
 <h3>👥 Refer & Earn - Only When Friend Boosts</h3>
 <p class="small"><b>⚠️ If your friend stays FREE, you get ₦0. You only earn when your friend buys VIP / boosts.</b></p>
 <table>
 <tr><th>Your Plan</th><th>Per Boosted Friend</th></tr>
 <tr><td>🆓 FREE</td><td>₦100</td></tr>
-<tr><td>🥉 Bronze</td><td>₦200</td></tr>
-<tr><td>🥈 Silver</td><td>₦250</td></tr>
-<tr><td>🥇 Gold</td><td>₦300</td></tr>
-<tr><td>💎 Platinum</td><td>₦400</td></tr>
-<tr><td>👑 Diamond</td><td>₦500</td></tr>
+<tr><td>🥉 Bronze</td><td>₦500</td></tr>
+<tr><td>🥈 Silver</td><td>₦500</td></tr>
+<tr><td>🥇 Gold</td><td>₦700</td></tr>
+<tr><td>💎 Platinum</td><td>₦800</td></tr>
+<tr><td>👑 Diamond</td><td>₦1000</td></tr>
 </table>
-<p class="small">Example: You are Gold, you invite 10 friends, 3 boost = 3 x ₦300 = ₦900. 7 FREE friends = ₦0.</p>
+<p class="small">Example: You are Gold, you invite 10 friends, 3 boost = 3 x ₦700 = ₦2,100. 7 FREE friends = ₦0.</p>
 <input id="refLink" readonly>
 <button onclick="copyRef()" class="secondary">Copy Refer Link</button>
 <p class="small" id="refMsg"></p>
@@ -112,15 +112,15 @@ th{background:#1e2a4a;color:#00ff88}
 <table>
 <tr><th>Plan</th><th>No Referral</th><th>+5 Boosted</th><th>+10 Boosted</th></tr>
 <tr><td>FREE</td><td>₦975</td><td>₦1,475</td><td>₦1,975</td></tr>
-<tr><td>Bronze</td><td>₦1,025</td><td>₦2,025</td><td>₦3,025</td></tr>
-<tr><td>Silver</td><td>₦1,375</td><td>₦2,625</td><td>₦3,875</td></tr>
-<tr><td>Gold</td><td>₦2,175</td><td>₦3,675</td><td>₦5,175</td></tr>
-<tr><td>Platinum</td><td>₦4,025</td><td>₦6,025</td><td>₦8,025</td></tr>
-<tr><td>Diamond</td><td>₦8,025</td><td>₦10,525</td><td>₦13,025</td></tr>
+<tr><td>Bronze</td><td>₦1,025</td><td>₦3,525</td><td>₦6,025</td></tr>
+<tr><td>Silver</td><td>₦1,375</td><td>₦3,875</td><td>₦6,375</td></tr>
+<tr><td>Gold</td><td>₦2,175</td><td>₦5,675</td><td>₦9,175</td></tr>
+<tr><td>Platinum</td><td>₦4,025</td><td>₦8,025</td><td>₦12,025</td></tr>
+<tr><td>Diamond</td><td>₦8,025</td><td>₦13,025</td><td>₦18,025</td></tr>
 </table>
 <p class="small">Total Profit = Mining Profit + ₦525 Tasks + (Your Referral Price x Boosted Friends). Min Withdrawal ₦5,000.</p>
 </div>
-                                                                                                                                                                                                  </div><script>
+</div><script>
 let isLogin=false;
 let balance=parseInt(localStorage.getItem('balance')||'0');
 let plan=localStorage.getItem('plan')||'FREE';
@@ -129,7 +129,7 @@ let lastMine=parseInt(localStorage.getItem('lastMine')||'0');
 let tasksDone=JSON.parse(localStorage.getItem('tasksDone')||'{}');
 let today=new Date().toDateString();
 if(localStorage.getItem('taskDay')!==today){tasksDone={};localStorage.setItem('taskDay',today);}
-let refRates={'FREE':100,'Bronze':200,'Silver':250,'Gold':300,'Platinum':400,'Diamond':500};
+let refRates={'FREE':100,'Bronze':500,'Silver':500,'Gold':700,'Platinum':800,'Diamond':1000};
 function showAuth(){hideAll();document.getElementById('auth').classList.remove('hidden');}
 function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');}
 function hideAll(){['home','auth','dash'].forEach(id=>document.getElementById(id).classList.add('hidden'))}
