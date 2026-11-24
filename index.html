@@ -4,122 +4,588 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NairaMine - Mine Naira Daily</title>
+
+<!-- SUPABASE BASE LINKS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
-body{background:#0f172a;color:#fff;padding:15px;padding-bottom:80px}
-h1{color:#22c55e;text-align:center;margin:10px 0}
-h2{color:#facc15;margin:15px 0 8px}
-.card{background:#1e293b;border-radius:12px;padding:16px;margin:12px 0}
-button{width:100%;padding:14px;border:none;border-radius:10px;background:#22c55e;color:#000;font-weight:bold;font-size:16px;margin:8px 0;cursor:pointer}
-button:disabled{background:#475569;color:#cbd5e1}
-button.secondary{background:#facc15}
-input,select{width:100%;padding:12px;border-radius:8px;border:none;margin:6px 0;color:#000}
-.big{font-size:28px;font-weight:bold;color:#22c55e}
-.small{color:#cbd5e1;font-size:14px}
-.vip{background:#312e81;border:1px solid #facc15}
-.nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#1e293b;padding:8px}
-.nav button{margin:4px;background:#334155;color:#fff;font-size:13px;padding:10px}
-.hidden{display:none}
+    * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  body {
+    background: #0f172a;
+    color: #fff;
+    padding: 15px;
+    padding-bottom: 90px;
+  }
+  h1 {
+    color: #22c55e;
+    text-align: center;
+    margin: 10px 0;
+  }
+  h2 {
+    color: #facc15;
+    margin: 15px 0 8px;
+  }
+  .card {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #22c55e;
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 8px 0;
+    cursor: pointer;
+  }
+  button:disabled {
+    background: #475569;
+    color: #cbd5e1;
+  }
+  button.secondary {
+    background: #facc15;
+  }
+  button.telegram {
+    background: #229ED9;
+    color: #fff;
+  }
+  button.ad {
+    background: #ff6b00;
+    color: #fff;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    margin: 6px 0;
+    color: #000;
+  }
+  .big {
+    font-size: 28px;
+    font-weight: bold;
+    color: #22c55e;
+  }
+  .small {
+    color: #cbd5e1;
+    font-size: 14px;
+  }
+  .vip {
+    background: #312e81;
+    border: 1px solid #facc15;
+  }
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    background: #1e293b;
+    padding: 8px;
+  }
+  .nav button {
+    margin: 4px;
+    background: #334155;
+    color: #fff;
+    font-size: 13px;
+    padding: 10px;
+  }
+  .hidden {
+    display: none;
+  }
 </style>
 </head>
 <body>
+
 <h1>💰 NairaMine</h1>
 <p style="text-align:center" class="small">Mine ₦ Daily • 15 Days • Withdraw ₦5,000+</p>
+<p style="text-align:center" class="small">Support: WhatsApp 09158978606 • Telegram @NairaMineOfficial</p>
+
 <div id="homeSection">
-<div class="card">
-<h2>Welcome</h2>
-<p class="small">Mine every 4 hours. Buy VIP to earn more. Complete 15 days to withdraw.</p>
-<button onclick="showDashboard()">Enter Dashboard →</button>
+  <div class="card">
+    <h2>Welcome</h2>
+    <p class="small">Mine every 4 hours. Free miners earn ₦5 per mine. Buy VIP to earn more. Complete 15 days to withdraw.</p>
+    <button onclick="showDashboard()">Enter Dashboard →</button>
+  </div>
+
+  <div class="card vip">
+    <h2>⭐ VIP Plans - STABLE PRICE</h2>
+    <p>Free: ₦5 / mine - Free</p>
+    <p>VIP 1: ₦150 / mine - ₦2,000</p>
+    <p>VIP 2: ₦400 / mine - ₦5,000</p>
+    <p>VIP 3: ₦1000 / mine - ₦10,000</p>
+    <p class="small">Prices never change. Pay once, mine higher forever.</p>
+    <button class="secondary" onclick="showDashboard()">Go To Dashboard</button>
+  </div>
+
+  <div class="card">
+    <h2>📱 Join Us</h2>
+    <button class="telegram" onclick="openTelegram()">Join Telegram Channel</button>
+    <button class="secondary" onclick="openWhatsApp('Hello Admin, I need help with NairaMine')">Chat Admin on WhatsApp - 09158978606</button>
+    <button class="ad" onclick="openAdsterra()">Watch Ad & Earn</button>
+  </div>
+  </div><div id="dashSection" class="hidden">
+
+  <div class="card">
+    <p>Balance</p>
+    <div class="big">₦<span id="bal">0</span></div>
+    <p class="small" id="daysLeftMsg"></p>
+    <p class="small">Plan: <span id="planName">Free</span> • Per Mine: ₦<span id="perMine">5</span> • Referrals: <span id="refCount">0</span> • Referral Earnings: ₦<span id="refEarnings">0</span></p>
+  </div>
+
+  <div class="card">
+    <h2>⛏️ Mining - 4 Hours</h2>
+    <button id="mineBtn" onclick="mine()">⛏️ Mine Now</button>
+    <p id="timer" class="small">Ready to mine!</p>
+    <p class="small">Free = ₦5 / 4hrs. VIP earns more. Timer keeps running even if you close the app.</p>
+  </div>
+
+  <div class="card">
+    <h2>🎁 Daily Tasks</h2>
+    <button class="telegram" onclick="doTask('task_telegram', 20, this)">Join Telegram Channel +₦20</button>
+    <button onclick="doTask('task_whatsapp', 20, this)">Join WhatsApp Channel +₦20</button>
+    <button onclick="doTask('task_share', 20, this)">Share Referral Link +₦20</button>
+    <button class="ad" onclick="watchAdTask(this)">Watch Adsterra Ad +₦30</button>
+  </div>
+
+  <div class="card vip">
+    <h2>⭐ Buy VIP - STABLE PRICE</h2>
+    <button onclick="buyVip('VIP 1', 2000)">Buy VIP 1 - ₦2,000 (₦150/mine)</button>
+    <button onclick="buyVip('VIP 2', 5000)">Buy VIP 2 - ₦5,000 (₦400/mine)</button>
+    <button onclick="buyVip('VIP 3', 10000)">Buy VIP 3 - ₦10,000 (₦1000/mine)</button>
+    <button onclick="setPlan('Free', 5)">Use Free Plan - ₦5/mine</button>
+    <p class="small">Already paid? Send proof below, then tap Activate.</p>
+    <select id="activateSelect">
+      <option>VIP 1</option>
+      <option>VIP 2</option>
+      <option>VIP 3</option>
+    </select>
+    <button class="secondary" onclick="activateVip(document.getElementById('activateSelect').value)">I Have Paid - Activate My VIP</button>
+  </div>
+
+  <div class="card">
+    <h2>🏦 Withdraw</h2>
+    <input id="acctNum" placeholder="10-digit Account Number" maxlength="10" inputmode="numeric">
+    <input id="acctName" placeholder="Account Name">
+    <select id="bankName">
+      <option>OPay</option>
+      <option>Moniepoint</option>
+      <option>GTBank</option>
+      <option>Access Bank</option>
+      <option>First Bank</option>
+      <option>UBA</option>
+      <option>Kuda</option>
+      <option>PalmPay</option>
+    </select>
+    <button onclick="saveAccount()">Save Account</button>
+    <p id="savedMsg" class="small"></p>
+    <button onclick="withdraw()">Request Withdrawal</button>
+    <p id="withdrawMsg" class="small"></p>
+  </div>
+
+  <div class="card">
+    <h2>🧾 Proof of Payment</h2>
+    <p class="small">Paid for VIP? Send proof here. Admin: 09158978606</p>
+    <input id="proofName" placeholder="Your Name for Proof">
+    <input id="proofAmount" placeholder="Amount Paid e.g 2000" inputmode="numeric">
+    <input id="proofRef" placeholder="Your Referral Code / Username (optional)">
+    <button class="secondary" onclick="sendProof()">Send Payment Proof on WhatsApp</button>
+    <button onclick="sendProofTelegram()">Send Proof on Telegram</button>
+    <p class="small">Attach your receipt screenshot in WhatsApp / Telegram after tapping.</p>
+  </div>
+
+  <div class="card">
+    <h2>👥 Referral - Earn More When Friends Join</h2>
+    <p class="small">You get ₦100 for every friend who joins with your link AND ₦500 extra when they buy VIP.</p>
+    <input id="refLink" value="https://nairamine.onrender.com/?ref=YOURNAME" readonly>
+    <button onclick="copyRef()">Copy Referral Link</button>
+    <button class="secondary" onclick="claimReferralBonus()">I Invited A Friend - Claim ₦100 Bonus</button>
+    <p id="refMsg" class="small"></p>
+  </div>
+
+  <div class="card">
+    <h2>📞 Support</h2>
+    <p class="small">Phone / WhatsApp: 09158978606</p>
+    <p class="small">Telegram: @NairaMineOfficial</p>
+    <button onclick="openWhatsApp('Hello Admin, I need help')">Chat on WhatsApp</button>
+    <button class="telegram" onclick="openTelegram()">Open Telegram</button>
+  </div>
+
+  <button onclick="logout()">← Back Home</button>
 </div>
-<div class="card vip">
-<h2>⭐ VIP Plans</h2>
-<p>Free: ₦50 / mine</p>
-<p>VIP 1: ₦150 / mine - ₦2,000</p>
-<p>VIP 2: ₦400 / mine - ₦5,000</p>
-<p>VIP 3: ₦1000 / mine - ₦10,000</p>
-<button class="secondary" onclick="showDashboard()">Go To Dashboard</button>
-</div>
-</div><div id="dashSection" class="hidden">
-<div class="card">
-<p>Balance</p>
-<div class="big">₦<span id="bal">0</span></div>
-<p class="small" id="daysLeftMsg"></p>
-<p class="small">Plan: <span id="planName">Free</span> • Per Mine: ₦<span id="perMine">50</span></p>
-</div>
-<div class="card">
-<h2>⛏️ Mining</h2>
-<button id="mineBtn" onclick="mine()">⛏️ Mine Now</button>
-<p id="timer" class="small">Ready to mine!</p>
-</div>
-<div class="card">
-<h2>🎁 Daily Tasks</h2>
-<button onclick="doTask('task1',20,this)">Join WhatsApp Channel +₦20</button>
-<button onclick="doTask('task2',20,this)">Share Referral Link +₦20</button>
-<button onclick="doTask('task3',30,this)">Watch Ad / Invite Friend +₦30</button>
-</div>
-<div class="card vip">
-<h2>⭐ Buy VIP</h2>
-<button onclick="buyVip('VIP 1',2000)">Buy VIP 1 - ₦2,000 (₦150/mine)</button>
-<button onclick="buyVip('VIP 2',5000)">Buy VIP 2 - ₦5,000 (₦400/mine)</button>
-<button onclick="buyVip('VIP 3',10000)">Buy VIP 3 - ₦10,000 (₦1000/mine)</button>
-<button onclick="setPlan('Free',50)">Use Free Plan - ₦50/mine</button>
-</div>
-<div class="card">
-<h2>🏦 Withdraw</h2>
-<input id="acctNum" placeholder="10-digit Account Number" maxlength="10" inputmode="numeric">
-<input id="acctName" placeholder="Account Name">
-<select id="bankName"><option>OPay</option><option>Moniepoint</option><option>GTBank</option><option>Access Bank</option><option>First Bank</option><option>UBA</option><option>Kuda</option><option>PalmPay</option></select>
-<button onclick="saveAccount()">Save Account</button>
-<p id="savedMsg" class="small"></p>
-<input id="proofName" placeholder="Your Name for Proof">
-<input id="proofAmount" placeholder="Amount Paid e.g 2000" inputmode="numeric">
-<button class="secondary" onclick="sendProof()">Send Payment Proof on WhatsApp</button>
-<button onclick="withdraw()">Request Withdrawal</button>
-<p id="withdrawMsg" class="small"></p>
-</div>
-<div class="card">
-<h2>👥 Referral</h2>
-<input id="refLink" value="https://nairamine.onrender.com/?ref=YOURNAME" readonly>
-<button onclick="copyRef()">Copy Referral Link</button>
-<p id="refMsg" class="small"></p>
-<p class="small">You earn only when friend buys VIP.</p>
-</div>
-<button onclick="logout()">← Back Home</button>
-</div>
+
 <div class="nav">
-<button onclick="showHome()">🏠 Home</button>
-<button onclick="showDashboard()">📊 Dashboard</button>
-<button onclick="showDashboard()">⛏️ Mine</button>
-<button onclick="showDashboard()">🏦 Withdraw</button>
-  </div><script>
+  <button onclick="showHome()">🏠 Home</button>
+  <button onclick="showDashboard()">📊 Dashboard</button>
+  <button onclick="showDashboard()">⛏️ Mine</button>
+  <button onclick="showDashboard()">🏦 Withdraw</button>
+</div><script>
+// ================= LINKS - CHANGE THESE 3 ONLY =================
+const TELEGRAM_LINK = 'https://t.me/NairaMineOfficial';
+const ADSTERRA_LINK = 'https://www.adsterra.com/?ref=YOUR_ADSTERRA_ID';
+const WHATSAPP_NUMBER = '2349158978606';
+const ADMIN_PHONE_DISPLAY = '09158978606';
+
+// ================= SUPABASE BASE LINK =================
 const SUPABASE_URL = 'https://davewpdrbzztwnkoiizh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_rOWejGUjcJBQrMFVW3rcOQ_6yuMzAcm';
 let supabaseClient = null;
-try{ if(window.supabase && window.supabase.createClient){ supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } }catch(e){ console.log('Supabase local only', e); }
+
+try {
+  if (window.supabase && window.supabase.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch (e) {
+  console.log('Supabase not loaded, using local only', e);
+}
+
+// ================= VIP PLAN - STABLE PRICE - REPLACED & FIXED =================
+const PRICES = {
+  'Free': 5,
+  'VIP 1': 150,
+  'VIP 2': 400,
+  'VIP 3': 1000
+};
+
+const VIP_PRICES_NAIRA = {
+  'VIP 1': 2000,
+  'VIP 2': 5000,
+  'VIP 3': 10000
+};
+
+const REFERRAL_JOIN_BONUS = 100;
+const REFERRAL_VIP_BONUS = 500;
+
+// ================= STATE - SAVED, NEVER CLEARS =================
 let balance = parseInt(localStorage.getItem('balance') || '0');
 let lastMine = parseInt(localStorage.getItem('lastMine') || '0');
 let plan = localStorage.getItem('plan') || 'Free';
-let mineAmount = parseInt(localStorage.getItem('mineAmount') || '50');
+let mineAmount = parseInt(localStorage.getItem('mineAmount') || '5');
+let referralCount = parseInt(localStorage.getItem('refCount') || '0');
+let referralEarnings = parseInt(localStorage.getItem('refEarnings') || '0');
 let tasksDone = {};
-try{ tasksDone = JSON.parse(localStorage.getItem('tasksDone') || '{}'); }catch(e){ tasksDone={}; }
-function showHome(){ document.getElementById('homeSection').classList.remove('hidden'); document.getElementById('dashSection').classList.add('hidden'); }
-function showDashboard(){ document.getElementById('homeSection').classList.add('hidden'); document.getElementById('dashSection').classList.remove('hidden'); updateUI(); updateTimer(); updateDays(); loadSavedAccount(); }
-function updateUI(){ document.getElementById('bal').innerText = balance.toLocaleString(); document.getElementById('planName').innerText = plan; document.getElementById('perMine').innerText = mineAmount; localStorage.setItem('balance', balance); localStorage.setItem('lastMine', lastMine); localStorage.setItem('plan', plan); localStorage.setItem('mineAmount', mineAmount); }
-function mine(){ let now = Date.now(); let diff = now - lastMine; if(diff < 4*60*60*1000 && lastMine !== 0){ alert('Wait! You can mine again in ' + formatTime(4*60*60*1000 - diff)); return; } balance += mineAmount; lastMine = now; localStorage.setItem('lastMine', lastMine); localStorage.setItem('balance', balance); updateUI(); updateTimer(); alert('✅ You mined ₦' + mineAmount + '! Balance: ₦' + balance); }
-function formatTime(ms){ let h = Math.floor(ms/3600000); let m = Math.floor((ms%3600000)/60000); let s = Math.floor((ms%60000)/1000); return h+'h '+m+'m '+s+'s'; }
-function updateTimer(){ let now = Date.now(); let remain = 4*60*60*1000 - (now - lastMine); let btn = document.getElementById('mineBtn'); let t = document.getElementById('timer'); if(!btn || !t) return; if(lastMine === 0 || remain <= 0){ btn.disabled = false; btn.innerText = '⛏️ Mine Now - ₦' + mineAmount; t.innerText = 'Ready to mine!'; } else { btn.disabled = true; btn.innerText = '⏳ Mining Locked'; t.innerText = 'Next mine in: ' + formatTime(remain); } }
-function setPlan(p, amt){ plan = p; mineAmount = amt; localStorage.setItem('plan', plan); localStorage.setItem('mineAmount', mineAmount); updateUI(); updateTimer(); alert('Plan set to ' + p + ' - ₦' + amt + ' per mine'); }
-function buyVip(p, price){ let ok = confirm('Buy ' + p + ' for ₦' + price + '? Message admin on WhatsApp 09158978606 to get account number, pay, then send proof. Tap OK to open WhatsApp.'); if(ok){ window.open('https://wa.me/2349158978606?text=' + encodeURIComponent('Hello Admin, I want to buy ' + p + ' VIP for ₦' + price + '. Please send account number.'), '_blank'); } }function doTask(key, amt, btn){ if(tasksDone[key]){ alert('Already claimed today'); return; } tasksDone[key] = true; localStorage.setItem('tasksDone', JSON.stringify(tasksDone)); balance += amt; updateUI(); btn.innerText = 'Done ✓'; btn.disabled = true; alert('✅ +₦' + amt + ' Task done!'); }
-function sendProof(){ let n = document.getElementById('proofName').value.trim(); let a = document.getElementById('proofAmount').value.trim(); if(!n || !a){ alert('Enter name and amount'); return; } window.open('https://wa.me/2349158978606?text=' + encodeURIComponent('Hello Admin, I paid for VIP/Boost. Name: ' + n + ' Amount: ₦' + a + ' I will attach my receipt.'), '_blank'); }
-function loadSavedAccount(){ let num = localStorage.getItem('nm_acct') || ''; let name = localStorage.getItem('nm_name') || ''; let bank = localStorage.getItem('nm_bank') || 'OPay'; if(num) document.getElementById('acctNum').value = num; if(name) document.getElementById('acctName').value = name; document.getElementById('bankName').value = bank; if(num) document.getElementById('savedMsg').innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')'; }
-function saveAccount(){ let num = document.getElementById('acctNum').value.trim(); let name = document.getElementById('acctName').value.trim(); let bank = document.getElementById('bankName').value; if(num.length !== 10){ alert('Account number must be 10 digits!'); return; } if(!name){ alert('Enter account name!'); return; } localStorage.setItem('nm_acct', num); localStorage.setItem('nm_name', name); localStorage.setItem('nm_bank', bank); document.getElementById('savedMsg').innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')'; alert('Account saved!'); }
-function updateDays(){ let first = localStorage.getItem('nm_first_day'); if(!first){ first = Date.now(); localStorage.setItem('nm_first_day', first); } let used = Math.floor((Date.now() - parseInt(first)) / (1000*60*60*24)); let left = 15 - used; if(left < 0) left = 0; let el = document.getElementById('daysLeftMsg'); if(el) el.innerText = left === 0 ? '✅ 15 days complete' : '⏳ Day ' + (used+1) + ' of 15 - ' + left + ' days left'; }
-function getDaysLeft(){ let first = parseInt(localStorage.getItem('nm_first_day') || Date.now()); let used = Math.floor((Date.now() - first) / (1000*60*60*24)); let left = 15 - used; return left < 0 ? 0 : left; }
-function withdraw(){ let msg = document.getElementById('withdrawMsg'); let num = document.getElementById('acctNum').value.trim(); if(balance < 5000){ msg.innerText = '❌ Minimum withdrawal is ₦5,000. Your balance: ₦' + balance.toLocaleString() + '. Keep mining!'; return; } if(getDaysLeft() > 0){ msg.innerText = '❌ You have ' + getDaysLeft() + ' days left. Complete 15 days first.'; return; } if(num.length !== 10){ msg.innerText = '❌ First save your 10-digit account number!'; return; } msg.innerText = '✅ Withdraw request sent! ₦' + balance.toLocaleString() + ' to ' + document.getElementById('bankName').value + ' - ' + num + '. Admin will contact you.'; balance = 0; updateUI(); }
-function copyRef(){ let i = document.getElementById('refLink'); i.select(); document.execCommand('copy'); document.getElementById('refMsg').innerText = 'Link copied! You earn only when friend buys VIP.'; }
-function logout(){ showHome(); }
+
+try {
+  tasksDone = JSON.parse(localStorage.getItem('tasksDone') || '{}');
+} catch (e) {
+  tasksDone = {};
+}
+
+// ================= NAVIGATION =================
+function showHome() {
+  document.getElementById('homeSection').classList.remove('hidden');
+  document.getElementById('dashSection').classList.add('hidden');
+}
+
+function showDashboard() {
+  document.getElementById('homeSection').classList.add('hidden');
+  document.getElementById('dashSection').classList.remove('hidden');
+  updateUI();
+  updateTimer();
+  updateDays();
+  loadSavedAccount();
+  checkIncomingReferral();
+}
+
+function openTelegram() {
+  window.open(TELEGRAM_LINK, '_blank');
+}
+
+function openAdsterra() {
+  window.open(ADSTERRA_LINK, '_blank');
+}
+
+function openWhatsApp(text) {
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text), '_blank');
+}
+
+// ================= UI + SAVE =================
+function updateUI() {
+  document.getElementById('bal').innerText = balance.toLocaleString();
+  document.getElementById('planName').innerText = plan;
+  document.getElementById('perMine').innerText = mineAmount;
+  document.getElementById('refCount').innerText = referralCount;
+  document.getElementById('refEarnings').innerText = referralEarnings.toLocaleString();
+  localStorage.setItem('balance', balance);
+  localStorage.setItem('lastMine', lastMine);
+  localStorage.setItem('plan', plan);
+  localStorage.setItem('mineAmount', mineAmount);
+  localStorage.setItem('refCount', referralCount);
+  localStorage.setItem('refEarnings', referralEarnings);
+}
+
+// ================= MINING - 4 HOURS, FREE = ₦5 =================
+function mine() {
+  let now = Date.now();
+  let diff = now - lastMine;
+  if (diff < 4 * 60 * 60 * 1000 && lastMine !== 0) {
+    alert('Wait! You can mine again in ' + formatTime(4 * 60 * 60 * 1000 - diff));
+    return;
+  }
+  balance += mineAmount;
+  lastMine = now;
+  localStorage.setItem('lastMine', lastMine);
+  localStorage.setItem('balance', balance);
+  updateUI();
+  updateTimer();
+  alert('✅ You mined ₦' + mineAmount + '! Balance: ₦' + balance);
+}
+
+function formatTime(ms) {
+  let h = Math.floor(ms / 3600000);
+  let m = Math.floor((ms % 3600000) / 60000);
+  let s = Math.floor((ms % 60000) / 1000);
+  return h + 'h ' + m + 'm ' + s + 's';
+}
+
+function updateTimer() {
+  let now = Date.now();
+  let remain = 4 * 60 * 60 * 1000 - (now - lastMine);
+  let btn = document.getElementById('mineBtn');
+  let t = document.getElementById('timer');
+  if (!btn || !t) return;
+  if (lastMine === 0 || remain <= 0) {
+    btn.disabled = false;
+    btn.innerText = '⛏️ Mine Now - ₦' + mineAmount;
+    t.innerText = 'Ready to mine!';
+  } else {
+    btn.disabled = true;
+    btn.innerText = '⏳ Mining Locked';
+    t.innerText = 'Next mine in: ' + formatTime(remain);
+  }
+}
+
+// ================= VIP - REPLACED =================
+function setPlan(p, amt) {
+  let realAmount = PRICES[p];
+  if (!realAmount) {
+    alert('Invalid plan');
+    return;
+  }
+  plan = p;
+  mineAmount = realAmount;
+  localStorage.setItem('plan', plan);
+  localStorage.setItem('mineAmount', mineAmount);
+  updateUI();
+  updateTimer();
+}
+
+function buyVip(p, price) {
+  let correctPrice = VIP_PRICES_NAIRA[p];
+  if (price !== correctPrice) {
+    alert('Price error. Please refresh page.');
+    return;
+  }
+  let ok = confirm('Buy ' + p + ' for ₦' + price + '? You will mine ₦' + PRICES[p] + ' per 4 hours after admin confirms payment. Message admin on WhatsApp ' + ADMIN_PHONE_DISPLAY + ' to get account number, pay, then send proof. Tap OK to open WhatsApp.');
+  if (ok) {
+    openWhatsApp('Hello Admin, I want to buy ' + p + ' VIP for ₦' + price + '. Please send account number.');
+  }
+}
+
+function activateVip(p) {
+  let realAmount = PRICES[p];
+  if (!realAmount) {
+    alert('Invalid VIP');
+    return;
+  }
+  plan = p;
+  mineAmount = realAmount;
+  localStorage.setItem('plan', plan);
+  localStorage.setItem('mineAmount', mineAmount);
+  updateUI();
+  updateTimer();
+  alert('✅ ' + p + ' Activated! You now mine ₦' + mineAmount + ' every 4 hours.');
+}// ================= TASKS + ADSTERRA =================
+function doTask(key, amt, btn) {
+  if (tasksDone[key]) {
+    alert('Already claimed today');
+    return;
+  }
+  tasksDone[key] = true;
+  localStorage.setItem('tasksDone', JSON.stringify(tasksDone));
+  balance += amt;
+  updateUI();
+  btn.innerText = 'Done ✓';
+  btn.disabled = true;
+  if (key === 'task_telegram') {
+    openTelegram();
+  }
+  if (key === 'task_share') {
+    copyRef();
+  }
+  alert('✅ +₦' + amt + ' Task done!');
+}
+
+function watchAdTask(btn) {
+  if (tasksDone['task_ad']) {
+    alert('Already claimed today');
+    return;
+  }
+  openAdsterra();
+  tasksDone['task_ad'] = true;
+  localStorage.setItem('tasksDone', JSON.stringify(tasksDone));
+  balance += 30;
+  updateUI();
+  btn.innerText = 'Done ✓ - Ad Watched';
+  btn.disabled = true;
+  alert('✅ +₦30 Ad watched! Thank you.');
+}
+
+// ================= REFERRAL - INCREMENT OF MONEY =================
+function checkIncomingReferral() {
+  let params = new URLSearchParams(window.location.search);
+  let ref = params.get('ref');
+  if (ref) {
+    let already = localStorage.getItem('came_from_ref');
+    if (!already) {
+      localStorage.setItem('came_from_ref', ref);
+      document.getElementById('refMsg').innerText = 'You joined via ' + ref + '. Welcome!';
+    }
+  }
+}
+
+function copyRef() {
+  let myCode = localStorage.getItem('my_ref_code');
+  if (!myCode) {
+    myCode = 'USER' + Math.floor(1000 + Math.random() * 9000);
+    localStorage.setItem('my_ref_code', myCode);
+  }
+  let link = 'https://nairamine.onrender.com/?ref=' + myCode;
+  let i = document.getElementById('refLink');
+  i.value = link;
+  i.select();
+  document.execCommand('copy');
+  document.getElementById('refMsg').innerText = 'Link copied! You earn ₦100 per friend + ₦500 when they buy VIP.';
+}
+
+function claimReferralBonus() {
+  referralCount += 1;
+  referralEarnings += REFERRAL_JOIN_BONUS;
+  balance += REFERRAL_JOIN_BONUS;
+  updateUI();
+  alert('✅ Referral bonus! +₦' + REFERRAL_JOIN_BONUS + ' added. Total referrals: ' + referralCount);
+}
+
+function claimVipReferralBonus() {
+  referralEarnings += REFERRAL_VIP_BONUS;
+  balance += REFERRAL_VIP_BONUS;
+  updateUI();
+  alert('✅ VIP Referral bonus! +₦' + REFERRAL_VIP_BONUS + ' added.');
+}
+
+// ================= PROOF OF PAYMENT =================
+function sendProof() {
+  let n = document.getElementById('proofName').value.trim();
+  let a = document.getElementById('proofAmount').value.trim();
+  let r = document.getElementById('proofRef').value.trim();
+  if (!n || !a) {
+    alert('Enter name and amount');
+    return;
+  }
+  openWhatsApp('Hello Admin, I paid for VIP/Boost. Name: ' + n + ' Amount: ₦' + a + ' Referral Code: ' + r + ' I will attach my receipt.');
+}
+
+function sendProofTelegram() {
+  let n = document.getElementById('proofName').value.trim();
+  let a = document.getElementById('proofAmount').value.trim();
+  if (!n || !a) {
+    alert('Enter name and amount');
+    return;
+  }
+  window.open(TELEGRAM_LINK + '?text=' + encodeURIComponent('Hello Admin, Proof of Payment. Name: ' + n + ' Amount: ₦' + a), '_blank');
+}
+
+// ================= ACCOUNT + DAYS =================
+function loadSavedAccount() {
+  let num = localStorage.getItem('nm_acct') || '';
+  let name = localStorage.getItem('nm_name') || '';
+  let bank = localStorage.getItem('nm_bank') || 'OPay';
+  if (num) document.getElementById('acctNum').value = num;
+  if (name) document.getElementById('acctName').value = name;
+  document.getElementById('bankName').value = bank;
+  if (num) {
+    document.getElementById('savedMsg').innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')';
+  }
+}
+
+function saveAccount() {
+  let num = document.getElementById('acctNum').value.trim();
+  let name = document.getElementById('acctName').value.trim();
+  let bank = document.getElementById('bankName').value;
+  if (num.length !== 10) {
+    alert('Account number must be 10 digits!');
+    return;
+  }
+  if (!name) {
+    alert('Enter account name!');
+    return;
+  }
+  localStorage.setItem('nm_acct', num);
+  localStorage.setItem('nm_name', name);
+  localStorage.setItem('nm_bank', bank);
+  document.getElementById('savedMsg').innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')';
+  alert('Account saved!');
+}
+
+function updateDays() {
+  let first = localStorage.getItem('nm_first_day');
+  if (!first) {
+    first = Date.now();
+    localStorage.setItem('nm_first_day', first);
+  }
+  let used = Math.floor((Date.now() - parseInt(first)) / (1000 * 60 * 60 * 24));
+  let left = 15 - used;
+  if (left < 0) left = 0;
+  let el = document.getElementById('daysLeftMsg');
+  if (el) {
+    el.innerText = left === 0 ? '✅ 15 days complete' : '⏳ Day ' + (used + 1) + ' of 15 - ' + left + ' days left';
+  }
+}
+
+function getDaysLeft() {
+  let first = parseInt(localStorage.getItem('nm_first_day') || Date.now());
+  let used = Math.floor((Date.now() - first) / (1000 * 60 * 60 * 24));
+  let left = 15 - used;
+  return left < 0 ? 0 : left;
+}
+
+// ================= WITHDRAW =================
+function withdraw() {
+  let msg = document.getElementById('withdrawMsg');
+  let num = document.getElementById('acctNum').value.trim();
+  if (balance < 5000) {
+    msg.innerText = '❌ Minimum withdrawal is ₦5,000. Your balance: ₦' + balance.toLocaleString() + '. Keep mining!';
+    return;
+  }
+  if (getDaysLeft() > 0) {
+    msg.innerText = '❌ You have ' + getDaysLeft() + ' days left. Complete 15 days first.';
+    return;
+  }
+  if (num.length !== 10) {
+    msg.innerText = '❌ First save your 10-digit account number!';
+    return;
+  }
+  msg.innerText = '✅ Withdraw request sent! ₦' + balance.toLocaleString() + ' to ' + document.getElementById('bankName').value + ' - ' + num + '. Admin will contact you.';
+  balance = 0;
+  updateUI();
+}
+
+function logout() {
+  showHome();
+}
+
+// ================= START =================
 updateUI();
 updateTimer();
 setInterval(updateTimer, 1000);
