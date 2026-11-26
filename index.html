@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NairaMine - Earn in Naira</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
   body { font-family: Arial; background: #0a0f1e; color: white; text-align: center; padding: 20px; margin: 0; padding-bottom: 90px; }
   h1 { font-size: 32px; color: #00ff88; }
@@ -160,11 +159,9 @@
   <div class="card">
     <h3>🧾 Send Proof of Payment - VIP / Boost</h3>
     <p class="small">After you pay for VIP, enter details and send proof to admin on WhatsApp. Admin verifies manually.</p>
-    <input type="text" id="proofName" placeholder="Your Name">
     <input type="tel" id="proofAmount" placeholder="Amount Paid e.g. 4000">
     <input type="file" id="proofFile" accept="image/*">
     <button onclick="sendProof()" style="background:#25D366;">Send Proof on WhatsApp - 09158978606</button>
-    <button onclick="sendProofTelegram()">Send Proof on Telegram</button>
     <input type="text" id="proofRef" placeholder="Your Referral Code (optional)" style="display:none;">
   </div>
 
@@ -248,9 +245,17 @@ function userKey(key) {
   let e = (currentEmail || localStorage.getItem('nm_current_user') || 'guest').toString().trim().toLowerCase();
   return key + '_' + e;
 }
-function getTodayKey() { return new Date().toISOString().slice(0,10); }
+function getTodayKey() {
+  let d = new Date();
+  let y = d.getFullYear();
+  let m = String(d.getMonth() + 1).padStart(2, '0');
+  let day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
 function loadUserData() {
   currentEmail = localStorage.getItem('nm_current_user') || '';
+  if (!currentEmail) return; // Don't load if no user
+
   balance = parseInt(localStorage.getItem(userKey('balance')) || '0');
   lastMine = parseInt(localStorage.getItem(userKey('lastMine')) || '0');
   plan = localStorage.getItem(userKey('plan')) || 'Free';
@@ -258,10 +263,19 @@ function loadUserData() {
   referralCount = parseInt(localStorage.getItem(userKey('refCount')) || '0');
   referralEarnings = parseInt(localStorage.getItem(userKey('refEarnings')) || '0');
   try { tasksDone = JSON.parse(localStorage.getItem(userKey('tasksDone')) || '{}'); } catch (e) { tasksDone = {}; }
+  if (!tasksDone || typeof tasksDone !== 'object') tasksDone = {};
+
   let today = getTodayKey();
-  if (tasksDone._date !== today) { tasksDone = { _date: today }; localStorage.setItem(userKey('tasksDone'), JSON.stringify(tasksDone)); }
+  if (tasksDone._date !== today) {
+    tasksDone = { _date: today };
+    localStorage.setItem(userKey('tasksDone'), JSON.stringify(tasksDone));
+  }
   fixPrice();
+  if (typeof updateUI === 'function') updateUI();
+  if (typeof updateDisplay === 'function') updateDisplay();
+  autoMineCheck();
 }
+
 function saveUserData() {
   if (!currentEmail) return;
   localStorage.setItem(userKey('balance'), balance);
@@ -270,7 +284,29 @@ function saveUserData() {
   localStorage.setItem(userKey('mineAmount'), mineAmount);
   localStorage.setItem(userKey('refCount'), referralCount);
   localStorage.setItem(userKey('refEarnings'), referralEarnings);
-  localStorage.setItem(userKey('tasksDone'), JSON.stringify(tasksDone));
+  localStorage.setItem(userKey('tasksDone'), JSON.stringify(tasksDone || []));
+}
+
+// AUTO-MINE - Paid plans only, Free must click manually
+function autoMineCheck() {
+  if (!currentEmail) return; // STOP if no user logged in
+  if (plan === 'Free' || plan === 'FREE') return;
+
+  let lastAutoKey = userKey('lastAuto');
+  let lastAuto = localStorage.getItem(lastAutoKey);
+  let now = Date.now();
+  let oneDay = 24 * 60 * 60 * 1000;
+
+  if (!lastAuto || (now - Number(lastAuto) > oneDay)) {
+    let dailyAmount = DAILY[plan] || 0;
+    if (dailyAmount <= 0) return; // Don't alert for ₦0
+    balance += dailyAmount;
+    localStorage.setItem(lastAutoKey, now);
+    saveUserData();
+    if (typeof updateUI === 'function') updateUI();
+    if (typeof updateDisplay === 'function') updateDisplay();
+    alert('Auto-mined ₦' + dailyAmount + ' for your ' + plan + ' plan!');
+  }
 }
 
 // COMMAND: PRICE NEVER GOES BACK TO 0 AFTER 4 HOURS
@@ -285,28 +321,49 @@ function fixPrice() {
 
 let isSignupMode = true;
 function showHome() {
-  document.getElementById('home').classList.remove('hidden');
-  document.getElementById('auth').classList.add('hidden');
-  document.getElementById('dash').classList.add('hidden');
+  let home = document.getElementById('home');
+  let auth = document.getElementById('auth');
+  let dash = document.getElementById('dash');
+  if (home) home.classList.remove('hidden');
+  if (auth) auth.classList.add('hidden');
+  if (dash) dash.classList.add('hidden');
 }
 function showAuth() {
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('auth').classList.remove('hidden');
-  document.getElementById('dash').classList.add('hidden');
+  let home = document.getElementById('home');
+  let auth = document.getElementById('auth');
+  let dash = document.getElementById('dash');
+  if (home) home.classList.add('hidden');
+  if (auth) auth.classList.remove('hidden');
+  if (dash) dash.classList.add('hidden');
 }
 function toggleAuth() {
   isSignupMode = !isSignupMode;
-  document.getElementById('authTitle').innerText = isSignupMode ? 'Create Account' : 'Login';
-  document.getElementById('authBtn').innerText = isSignupMode ? 'Sign Up' : 'Login';
-  document.getElementById('toggleText').innerText = isSignupMode ? 'Already have account?' : "Don't have account?";
-  document.getElementById('toggleLink').innerText = isSignupMode ? 'Login' : 'Sign Up';
-  document.getElementById('msg').innerText = '';
+  let t;
+  t = document.getElementById('authTitle');
+  if (t) t.innerText = isSignupMode ? 'Create Account' : 'Login';
+  t = document.getElementById('authBtn');
+  if (t) t.innerText = isSignupMode ? 'Sign Up' : 'Login';
+  t = document.getElementById('toggleText');
+  if (t) t.innerText = isSignupMode ? 'Already have account?' : "Don't have account?";
+  t = document.getElementById('toggleLink');
+  if (t) t.innerText = isSignupMode ? 'Login' : 'Sign Up';
+  t = document.getElementById('msg');
+  if (t) t.innerText = '';
+
+  // Hide Name/Phone on Login, show on Signup
+  let nameEl = document.getElementById('name');
+  if (nameEl) nameEl.style.display = isSignupMode ? 'block' : 'none';
+  let phoneEl = document.getElementById('phone');
+  if (phoneEl) phoneEl.style.display = isSignupMode ? 'block' : 'none';
 }
 function showAuthTab(which) { if (which === 'login' && isSignupMode) toggleAuth(); if (which === 'signup' && !isSignupMode) toggleAuth(); }
 function showDashboard() {
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('auth').classList.add('hidden');
-  document.getElementById('dash').classList.remove('hidden');
+  let home = document.getElementById('home');
+  let auth = document.getElementById('auth');
+  let dash = document.getElementById('dash');
+  if (home) home.classList.add('hidden');
+  if (auth) auth.classList.add('hidden');
+  if (dash) dash.classList.remove('hidden');
   if (typeof updateUI === 'function') updateUI();
   window.scrollTo(0,0);
 }
@@ -318,14 +375,14 @@ function signup() {
   let phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
   let msg = document.getElementById('msg');
   if (!isSignupMode) { login(); return; }
-  if (!name) { msg.innerText = '❌ Enter your full name'; return; }
-  if (!email || !email.includes('@')) { msg.innerText = '❌ Enter a valid email'; return; }
-  if (!pass || pass.length < 4) { msg.innerText = '❌ Password must be at least 4 characters'; return; }
+  if (!name) { if (msg) msg.innerText = '❌ Enter your full name'; return; }
+  if (!email || !email.includes('@')) { if (msg) msg.innerText = '❌ Enter a valid email'; return; }
+  if (!pass || pass.length < 4) { if (msg) msg.innerText = '❌ Password must be at least 4 characters'; return; }
   let users = getUsers();
 
   // FIX: DON'T OVERWRITE EXISTING ACCOUNT
   if (users[email]) {
-    msg.innerText = '⚠️ This email already exists! Please Login instead, your balance is safe.';
+    if (msg) msg.innerText = '⚠️ This email already exists! Please Login instead, your balance is safe.';
     alert('⚠️ This email already exists! Please press Login instead. Your balance was NOT deleted.');
     return;
   }
@@ -335,46 +392,69 @@ function signup() {
   localStorage.setItem('nm_current_user', email);
   localStorage.setItem('nm_current_name', name);
   try { currentEmail = email; } catch(e) {}
-  try { loadUserData(); } catch(e) {}
-  try { plan = 'Free'; mineAmount = 5; balance = 0; lastMine = 0; saveUserData(); } catch(e) {}
+
+  // NEW user = fresh defaults, no load needed
+  plan = 'Free'; mineAmount = 5; balance = 0; lastMine = 0;
+  referralCount = 0; referralEarnings = 0;
+  saveUserData();
+
   let proof = document.getElementById('proofName');
   if (proof) proof.value = name;
-  msg.innerText = '✅ Account created! Welcome ' + name;
+  if (msg) msg.innerText = '✅ Account created! Welcome ' + name;
   alert('✅ Welcome ' + name + '! Account created. You can now mine.');
   showDashboard();
 }
 
 function login() {
-  let email = document.getElementById('email').value.trim().toLowerCase();
-  let pass = document.getElementById('password').value.trim();
+  let emailEl = document.getElementById('email');
+  let passEl = document.getElementById('password');
   let msg = document.getElementById('msg');
-  if (!email || !pass) { msg.innerText = '❌ Enter email and password'; return; }
+  let email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  let pass = passEl ? passEl.value.trim() : '';
+  if (!email || !pass) { if (msg) msg.innerText = '❌ Enter email and password'; return; }
   let users = getUsers();
   let user = users[email];
-  if (!user) { msg.innerText = '❌ No account with this email. Please Sign Up first.'; if (!isSignupMode) toggleAuth(); return; }
-  if (user.password !== pass) { msg.innerText = '❌ Wrong password'; return; }
+  if (!user) { if (msg) msg.innerText = '❌ No account with this email. Please Sign Up first.'; if (!isSignupMode) toggleAuth(); return; }
+  if (user.password !== pass) { if (msg) msg.innerText = '❌ Wrong password'; return; }
   localStorage.setItem('nm_current_user', email);
   localStorage.setItem('nm_current_name', user.name);
   try { currentEmail = email; } catch(e) {}
   let proof = document.getElementById('proofName');
   if (proof) proof.value = user.name;
-  msg.innerText = '✅ Welcome back ' + user.name;
+  if (msg) msg.innerText = '✅ Welcome back ' + user.name;
+
+  loadUserData(); // FIX: Load THIS user's balance before showing dashboard
+  updateDays();
   alert('✅ Welcome back ' + user.name);
   showDashboard();
-  }
+}
 function isLoggedIn() { return !!localStorage.getItem('nm_current_user'); }
 
 function updateUI() {
   fixPrice();
-  saveUserData();
-  document.getElementById('balance').innerText = balance.toLocaleString();
-  let displayPlan = plan === 'Free' ? 'FREE' : plan;
-  document.getElementById('planName').innerText = displayPlan;
-  document.getElementById('mineInfo').innerText = '₦' + mineAmount + ' / mine - ₦' + (DAILY[plan] || 30) + ' / day';
+  // DON'T call saveUserData() here - save only when balance actually changes
+
+  let el;
+  el = document.getElementById('balance');
+  if (el) el.innerText = balance.toLocaleString();
+
+  let displayPlan = (plan === 'Free' || plan === 'FREE') ? 'FREE' : plan;
+  el = document.getElementById('planName');
+  if (el) el.innerText = displayPlan;
+
+  el = document.getElementById('mineInfo');
+  if (el) el.innerText = '₦' + mineAmount + ' / mine - ₦' + (DAILY[plan] || 30) + ' / day';
+
   let rate = REFERRAL_BY_PLAN[plan] || 100;
-  document.getElementById('refRate').innerText = '₦' + rate;
-  document.getElementById('refCountDisplay').innerText = referralCount;
-  document.getElementById('refEarningsDisplay').innerText = referralEarnings.toLocaleString();
+  el = document.getElementById('refRate');
+  if (el) el.innerText = '₦' + rate;
+
+  el = document.getElementById('refCountDisplay');
+  if (el) el.innerText = referralCount;
+
+  el = document.getElementById('refEarningsDisplay');
+  if (el) el.innerText = referralEarnings.toLocaleString();
+
   let autoEl = document.getElementById('autoMineMsg');
   if (autoEl) {
     if (plan === 'Free' || plan === 'FREE') {
@@ -385,49 +465,67 @@ function updateUI() {
   }
 }
 
-// VIP AUTO-MINE: VIP balance increases on its own, FREE must click
-function checkAutoMine() {
-  if (!isLoggedIn()) return;
-  fixPrice();
-  if (plan === 'Free' || plan === 'FREE') return;
-  let now = Date.now();
-  if (lastMine === 0) {
-    lastMine = now;
-    saveUserData();
+// AUTO-MINE - Every 4 hours, Paid plans only, Free must click manually
+function autoMineCheck() {
+  if (plan === 'Free' || plan === 'FREE') {
     return;
   }
-  let diff = now - lastMine;
+
+  let lastAutoKey = userKey('lastAuto');
+  let lastAuto = parseInt(localStorage.getItem(lastAutoKey) || '0');
+  let now = Date.now();
   let fourHours = 4 * 60 * 60 * 1000;
-  if (diff >= fourHours) {
-    let cycles = Math.floor(diff / fourHours);
-    if (cycles > 6) cycles = 6;
-    let earned = cycles * mineAmount;
-    balance += earned;
-    lastMine = lastMine + (cycles * fourHours);
+
+  // First time ever - start counting from now, don't give free back-pay
+  if (!lastAuto) {
+    localStorage.setItem(lastAutoKey, now);
+    return;
+  }
+
+  // How many 4-hour blocks have passed?
+  let missed = Math.floor((now - lastAuto) / fourHours);
+
+  if (missed > 0) {
+    // Cap at 6 per day so they can't get 1 month of free money by not opening app
+    if (missed > 6) missed = 6;
+
+    let perMine = PRICES[plan] || 0;
+    let total = perMine * missed;
+
+    balance += total;
+    // Move lastAuto forward by the blocks we paid for
+    localStorage.setItem(lastAutoKey, lastAuto + (missed * fourHours));
+
     saveUserData();
-    updateUI();
+    updateDisplay();
+    alert('Auto-mined ' + missed + 'x ₦' + perMine + ' = ₦' + total + ' for your ' + plan + ' plan!');
   }
 }
 
+// COMMAND: PRICE NEVER GOES BACK TO 0 AFTER 4 HOURS
+
 function mine() {
   if (!isLoggedIn()) { alert('Login first'); showAuth(); return; }
-  loadUserData();
   fixPrice();
   let now = Date.now();
+
+  // VIP = NO MANUAL CLICK. Auto only.
+  if (plan !== 'Free' && plan !== 'FREE') {
+    alert('VIP Auto-mining is ON. Your balance increases on its own every 4 hours. You earn ₦' + (PRICES[plan] || 0) + ' per mine.');
+    return;
+  }
+
+  // FREE ONLY BELOW THIS LINE
   let diff = now - lastMine;
   if (diff < 4 * 60 * 60 * 1000 && lastMine !== 0) {
-    if (plan === 'Free' || plan === 'FREE') {
-      alert('Wait! You can mine again in ' + formatTime(4 * 60 * 60 * 1000 - diff));
-      return;
-    } else {
-      alert('VIP Auto-mining is ON. Your balance increases on its own every 4 hours. Next auto-mine in ' + formatTime(4 * 60 * 60 * 1000 - diff) + '. You earn ₦' + (DAILY[plan] || 0) + ' / day.');
-      return;
-    }
+    alert('Wait! You can mine again in ' + formatTime(4 * 60 * 60 * 1000 - diff));
+    return;
   }
+
   balance += mineAmount;
   lastMine = now;
   saveUserData();
-  updateUI();
+  updateDisplay();
   updateTimer();
   alert('✅ You mined ₦' + mineAmount + '! Balance: ₦' + balance + ' - Balance will NOT go back to 0.');
 }
@@ -441,13 +539,14 @@ function formatTime(ms) {
 
 function updateTimer() {
   fixPrice();
-  checkAutoMine();
+  autoMineCheck(); // FIXED: was checkAutoMine() which doesn't exist
   let now = Date.now();
-  let remain = 4 * 60 * 60 * 1000 - (now - lastMine);
   let btn = document.getElementById('mineBtn');
   let t = document.getElementById('timer');
   if (!btn || !t) return;
+
   if (plan === 'Free' || plan === 'FREE') {
+    let remain = 4 * 60 * 60 * 1000 - (now - lastMine);
     if (lastMine === 0 || remain <= 0) {
       btn.disabled = false;
       btn.innerText = '⛏️ Mine Now - ₦' + mineAmount + ' (FREE - Click to Mine)';
@@ -458,32 +557,29 @@ function updateTimer() {
       t.innerText = 'Next mine in: ' + formatTime(remain) + ' | Price locked: ₦' + mineAmount + ' - Will NOT go to ₦0';
     }
   } else {
+    // VIP - use lastAuto, not lastMine
+    let lastAutoKey = userKey('lastAuto');
+    let lastAuto = parseInt(localStorage.getItem(lastAutoKey) || '0');
+    let remain = 4 * 60 * 60 * 1000 - (now - lastAuto);
     btn.disabled = true;
-    btn.innerText = '✅ VIP Auto-Mining ON - ₦' + (DAILY[plan] || 0) + ' / day';
-    if (lastMine === 0 || remain <= 0) {
+    btn.innerText = '✅ VIP Auto-Mining ON - ₦' + ((PRICES[plan] || 0) * 6) + ' / day';
+    if (lastAuto === 0 || remain <= 0) {
       t.innerText = 'Auto-mining... Your balance increases on its own. Price: ₦' + mineAmount + ' - Will NOT go to ₦0';
     } else {
-      t.innerText = 'Next auto-mine in: ' + formatTime(remain) + ' | You earn ₦' + (DAILY[plan] || 0) + ' / day - No click needed.';
+      t.innerText = 'Next auto-mine in: ' + formatTime(remain) + ' | You earn ₦' + ((PRICES[plan] || 0) * 6) + ' / day - No click needed.';
     }
   }
 }
 
 function setPlan(p, amt) {
-  let realAmount = PRICES[p];
-  if (!realAmount) { alert('Invalid plan'); return; }
-  plan = p;
-  mineAmount = realAmount;
-  let users = getUsers();
-  if (currentEmail && users[currentEmail]) { users[currentEmail].plan = p; saveUsers(users); }
-  saveUserData();
-  updateUI();
-  updateTimer();
+  alert('To change plan, buy VIP and ask Admin to activate with code.');
+  return;
 }
 
 function buyVip(p, price) {
   let correctPrice = VIP_PRICES_NAIRA[p];
   if (price !== correctPrice) { alert('Price error. Please refresh page.'); return; }
-  let ok = confirm('Buy ' + p + ' for ₦' + price + '? You will mine ₦' + PRICES[p] + ' per 4 hours = ₦' + (DAILY[p] || 0) + ' per day, AUTO-mining ON after admin confirms payment. Message admin on WhatsApp ' + ADMIN_PHONE_DISPLAY + ' to get account number, pay, then send proof. Tap OK to open WhatsApp.');
+  let ok = confirm('Buy ' + p + ' for ₦' + price + '? You will mine ₦' + PRICES[p] + ' per 4 hours = ₦' + (PRICES[p] * 6) + ' per day, AUTO-mining ON after admin confirms payment. Message admin on WhatsApp ' + ADMIN_PHONE_DISPLAY + ' to get account number, pay, then send proof. Tap OK to open WhatsApp.');
   if (ok) { openWhatsApp('Hello Admin, I want to buy ' + p + ' VIP / Boost for ₦' + price + '. Please send account number.'); }
 }
 
@@ -509,34 +605,40 @@ function activateVipWithCode() {
   let users = getUsers();
   if (currentEmail && users[currentEmail]) { users[currentEmail].plan = p; saveUsers(users); }
   saveUserData();
-  updateUI();
+  // Start auto-mine timer from NOW so they don't get fake back-pay
+  localStorage.setItem(userKey('lastAuto'), Date.now());
+  updateDisplay();
   updateTimer();
   if (msgEl) msgEl.innerText = '✅ ' + p + ' Activated with Admin Code!';
-  alert('✅ ' + p + ' Activated! You now mine ₦' + mineAmount + ' every 4 hours = ₦' + (DAILY[p] || 0) + ' per day, AUTO. Price locked, will NOT go to ₦0.');
+  alert('✅ ' + p + ' Activated! You now mine ₦' + mineAmount + ' every 4 hours = ₦' + (PRICES[p] * 6) + ' per day, AUTO. Price locked, will NOT go to ₦0.');
 }function doTask(key, amt, btn) {
   if (!isLoggedIn()) { alert('Login first'); return; }
-  if (key !== 'task_telegram') { alert('Only Telegram and Ad tasks exist.'); return; }
+  if (key !== 'task_telegram') { alert('Only Telegram task exists.'); return; }
   if (tasksDone[key]) { alert('Already claimed today - come back tomorrow'); return; }
+
+  // FIXED: Amount is locked here. No one can change it from console.
+  let reward = 50; // <-- Change this to whatever your Telegram task pays
   tasksDone[key] = true;
-  balance += amt;
+  balance += reward;
   saveUserData();
-  updateUI();
-  btn.innerText = 'Done ✓';
-  btn.disabled = true;
+  updateDisplay(); // FIXED: was updateUI()
+  if (btn) { btn.innerText = 'Done ✓'; btn.disabled = true; }
   openTelegram();
-  alert('✅ +₦' + amt + ' Telegram Task done!');
+  alert('✅ +₦' + reward + ' Telegram Task done!');
 }
 
 function watchAdTask(btn) {
   if (!isLoggedIn()) { alert('Login first'); return; }
-  if (tasksDone['task_ad']) { alert('Already claimed today - come back tomorrow'); return; }
+  // FIX: Per-account + Per-day
+  let today = new Date().toDateString(); // e.g. "Thu Nov 26 2026"
+  let key = userKey('task_ad_' + today);
+  if (tasksDone[key]) { alert('Already claimed today - come back tomorrow'); return; }
   openAdsterra();
-  tasksDone['task_ad'] = true;
+  tasksDone[key] = true;
   balance += 30;
   saveUserData();
-  updateUI();
-  btn.innerText = 'Done ✓ - Ad Watched';
-  btn.disabled = true;
+  updateDisplay(); // FIXED: was updateUI()
+  if (btn) { btn.innerText = 'Done ✓ - Ad Watched'; btn.disabled = true; }
   alert('✅ +₦30 Ad watched! Thank you.');
 }
 
@@ -544,19 +646,30 @@ function checkIncomingReferral() {
   let params = new URLSearchParams(window.location.search);
   let ref = params.get('ref');
   if (ref) {
-    let already = localStorage.getItem('came_from_ref');
-    if (!already) {
-      localStorage.setItem('came_from_ref', ref);
-      document.getElementById('refMsg').innerText = 'You joined via ' + ref + '. Welcome! Your inviter only earns if you Boost.';
-    }
+    // FIX: Always update to the LATEST link clicked, don't block it
+    // This is a pending ref - it will be saved to the account on signup
+    localStorage.setItem('pending_ref', ref);
+    let msg = document.getElementById('refMsg');
+    if (msg) msg.innerText = 'You joined via ' + ref + '. Welcome! Your inviter only earns if you Boost.';
   }
-}
+    }
 
-function copyRef() {
-  let myCode = localStorage.getItem('my_ref_code');
+function copyReferralLink() {
+  let email = (localStorage.getItem('nm_current_user') || '').toLowerCase();
+  // FIX: Code is PER-ACCOUNT, not per-phone
+  let key = 'my_ref_code_' + email;
+  let myCode = localStorage.getItem(key);
   if (!myCode) {
     myCode = 'USER' + Math.floor(1000 + Math.random() * 9000);
-    localStorage.setItem('my_ref_code', myCode);
+    localStorage.setItem(key, myCode);
+    // Also save it inside your user account so it follows you
+    try {
+      let users = getUsers();
+      if (users[email]) {
+        users[email].refCode = myCode;
+        saveUsers(users);
+      }
+    } catch(e) {}
   }
   let link = 'https://nairamine.onrender.com/?ref=' + myCode;
   let i = document.getElementById('refLink');
@@ -564,23 +677,28 @@ function copyRef() {
   i.select();
   document.execCommand('copy');
   let myBonus = REFERRAL_BY_PLAN[plan] || 100;
-  document.getElementById('refMsg').innerText = 'Link copied! You are ' + plan + ', you earn ₦' + myBonus + ' per BOOSTED friend. FREE friends = ₦0.';
+  document.getElementById('refMsg').innerText = 'Link copied! You are ' + plan + ', you earn ₦' + myBonus + ' per BOOSTED friend. FREE friends = ₦0. Your Code: ' + myCode;
 }
 
 function claimReferralBonus() {
+  let currentEmail = (localStorage.getItem('nm_current_user') || '').toLowerCase();
+  if (!currentEmail) { alert('Login first'); return; }
+  let users = getUsers();
+  let me = users[currentEmail] || {};
+  let plan = me.plan || 'Free';
+
   let friendEmail = document.getElementById('friendEmailClaim').value.trim().toLowerCase();
   if (!friendEmail) {
-    alert('❌ Enter your friend\'s email first. If you have not invited anyone, your balance will NOT increase.');
+    alert('❌ Enter your friend\'s email first.');
     return;
   }
   if (friendEmail === currentEmail) {
     alert('❌ You cannot refer yourself.');
     return;
   }
-  let users = getUsers();
   let friend = users[friendEmail];
   if (!friend) {
-    alert('❌ This friend has NOT signed up yet. You get ₦0. Invite them first, let them sign up + boost, then try again.');
+    alert('❌ This friend has NOT signed up yet. You get ₦0.');
     return;
   }
   let friendPlan = friend.plan || 'Free';
@@ -588,9 +706,13 @@ function claimReferralBonus() {
     alert('❌ Your friend is still FREE. You get ₦0. You only earn when friend buys VIP / boosts.');
     return;
   }
+  let myCode = localStorage.getItem('my_ref_code_' + currentEmail);
+  if (friend.referredBy && friend.referredBy !== myCode) {
+    alert('❌ This friend was NOT invited by you.');
+    return;
+  }
   let claimedKey = 'claimed_' + friendEmail;
-  let alreadyClaimed = localStorage.getItem(userKey(claimedKey));
-  if (alreadyClaimed) {
+  if (localStorage.getItem(userKey(claimedKey))) {
     alert('❌ You already claimed bonus for this friend.');
     return;
   }
@@ -605,53 +727,66 @@ function claimReferralBonus() {
 }
 
 function sendProof() {
-  let n = document.getElementById('proofName').value.trim();
+  if (!isLoggedIn()) { alert('Login first'); return; }
   let a = document.getElementById('proofAmount').value.trim();
-  let r = '';
   let refEl = document.getElementById('proofRef');
-  if (refEl) r = refEl.value.trim();
+  let r = refEl ? refEl.value.trim() : '';
   let fileEl = document.getElementById('proofFile');
   let hasFile = fileEl && fileEl.files && fileEl.files.length > 0;
-  if (!n || !a) { alert('Enter name and amount'); return; }
-  let msg = 'Hello Admin, I paid for VIP/Boost. Name: ' + n + ' Amount: ₦' + a + ' Referral Code: ' + r + ' I will attach my receipt.';
+  if (!a) { alert('Enter amount'); return; }
+
+  // FIX: Use LOGGED-IN account, not typed name
+  let email = (localStorage.getItem('nm_current_user') || '').toLowerCase();
+  let users = getUsers();
+  let me = users[email] || {};
+  let n = me.name || email;
+  let myCode = localStorage.getItem('my_ref_code_' + email) || me.refCode || '';
+
+  let msg = 'Hello Admin, I paid for VIP/Boost. Name: ' + n + ' Email: ' + email + ' Amount: ₦' + a + ' My Referral Code: ' + myCode + ' Typed Code: ' + r + ' I will attach my receipt.';
   if (hasFile) { msg += ' I selected a receipt image to attach.'; }
   openWhatsApp(msg);
   alert('Now attach your receipt screenshot in WhatsApp after it opens. Admin verifies manually.');
 }
 
-function sendProofTelegram() {
-  let n = document.getElementById('proofName').value.trim();
-  let a = document.getElementById('proofAmount').value.trim();
-  if (!n || !a) { alert('Enter name and amount'); return; }
-  window.open(TELEGRAM_LINK + '?text=' + encodeURIComponent('Hello Admin, Proof of Payment. Name: ' + n + ' Amount: ₦' + a), '_blank');
-}
-
 function loadSavedAccount() {
-  let num = localStorage.getItem('nm_acct') || '';
-  let name = localStorage.getItem('nm_name') || '';
-  let bank = localStorage.getItem('nm_bank') || 'OPay';
-  if (num) document.getElementById('acctNum').value = num;
-  if (name) document.getElementById('acctName').value = name;
-  document.getElementById('bankName').value = bank;
-  if (num) { document.getElementById('savedMsg').innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')'; }
+  let numEl = document.getElementById('acctNum');
+  let nameEl = document.getElementById('acctName');
+  let bankEl = document.getElementById('bankName');
+  let msgEl = document.getElementById('savedMsg');
+  if (!numEl || !nameEl || !bankEl) return;
+
+  // FIX: Per-account, not per-phone
+  let num = localStorage.getItem(userKey('acct')) || '';
+  let name = localStorage.getItem(userKey('name')) || '';
+  let bank = localStorage.getItem(userKey('bank')) || 'OPay';
+
+  if (num) numEl.value = num;
+  if (name) nameEl.value = name;
+  bankEl.value = bank;
+  if (num && msgEl) { msgEl.innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')'; }
 }
 
 function saveAccount() {
   let num = document.getElementById('acctNum').value.trim();
   let name = document.getElementById('acctName').value.trim();
   let bank = document.getElementById('bankName').value;
-  if (num.length !== 10) { alert('Account number must be 10 digits!'); return; }
+  if (!/^\d{10}$/.test(num)) { alert('Account number must be 10 digits!'); return; }
   if (!name) { alert('Enter account name!'); return; }
-  localStorage.setItem('nm_acct', num);
-  localStorage.setItem('nm_name', name);
-  localStorage.setItem('nm_bank', bank);
-  document.getElementById('savedMsg').innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')';
+
+  // FIX: Per-account, not per-phone
+  localStorage.setItem(userKey('acct'), num);
+  localStorage.setItem(userKey('name'), name);
+  localStorage.setItem(userKey('bank'), bank);
+
+  let msg = document.getElementById('savedMsg');
+  if (msg) msg.innerText = 'Saved: ' + bank + ' - ' + num + ' (' + name + ')';
   alert('Account saved!');
 }
 
 function updateDays() {
-  let first = localStorage.getItem('nm_first_day');
-  if (!first) { first = Date.now(); localStorage.setItem('nm_first_day', first); }
+  if (!isLoggedIn()) return;
+  let first = localStorage.getItem(userKey('first_day'));
+  if (!first) { first = Date.now(); localStorage.setItem(userKey('first_day'), first); }
   let used = Math.floor((Date.now() - parseInt(first)) / (1000 * 60 * 60 * 24));
   let left = 15 - used;
   if (left < 0) left = 0;
@@ -660,39 +795,56 @@ function updateDays() {
 }
 
 function getDaysLeft() {
-  let first = parseInt(localStorage.getItem('nm_first_day') || Date.now());
+  let first = parseInt(localStorage.getItem(userKey('first_day')) || Date.now());
   let used = Math.floor((Date.now() - first) / (1000 * 60 * 60 * 24));
   let left = 15 - used;
   return left < 0 ? 0 : left;
 }
 
-function withdraw() {
+ function withdraw() {
+  if (!isLoggedIn()) { alert('Login first'); return; }
   let msg = document.getElementById('withdrawMsg');
-  let num = document.getElementById('acctNum').value.trim();
-  if (balance < 5000) { msg.innerText = '❌ Minimum withdrawal is ₦5,000. Your balance: ₦' + balance.toLocaleString() + '. Keep mining!'; return; }
-  if (getDaysLeft() > 0) { msg.innerText = '❌ You have ' + getDaysLeft() + ' days left. Complete 15 days first.'; return; }
-  if (num.length !== 10) { msg.innerText = '❌ First save your 10-digit account number!'; return; }
-  msg.innerText = '✅ Withdraw request sent! ₦' + balance.toLocaleString() + ' to ' + document.getElementById('bankName').value + ' - ' + num + '. Admin will contact you.';
+  let numEl = document.getElementById('acctNum');
+  let bankEl = document.getElementById('bankName');
+  let num = numEl ? numEl.value.trim() : localStorage.getItem(userKey('acct')) || '';
+  let bank = bankEl ? bankEl.value : localStorage.getItem(userKey('bank')) || 'OPay';
+
+  if (balance < 5000) {
+    if (msg) msg.innerText = '❌ Minimum withdrawal is ₦5,000. Your balance: ₦' + balance.toLocaleString() + '. Keep mining!';
+    return;
+  }
+  if (getDaysLeft() > 0) {
+    if (msg) msg.innerText = '❌ You have ' + getDaysLeft() + ' days left. Complete 15 days first.';
+    return;
+  }
+  if (!/^\d{10}$/.test(num)) {
+    if (msg) msg.innerText = '❌ First save your 10-digit account number!';
+    return;
+  }
+
+  // Save a record BEFORE zeroing, so admin can see it
+  let email = (localStorage.getItem('nm_current_user') || '').toLowerCase();
+  let reqs = JSON.parse(localStorage.getItem('nm_withdraw_reqs') || '[]');
+  reqs.push({ email: email, amount: balance, bank: bank, acct: num, date: new Date().toISOString(), status: 'pending' });
+  localStorage.setItem('nm_withdraw_reqs', JSON.stringify(reqs));
+
+  let amount = balance;
   balance = 0;
   saveUserData();
   updateUI();
-}
+  if (msg) msg.innerText = '✅ Withdraw request sent! ₦' + amount.toLocaleString() + ' to ' + bank + ' - ' + num + '. Admin will contact you.';
+ }
 
 function logout() {
   localStorage.removeItem('nm_current_user');
   localStorage.removeItem('nm_current_name');
+  balance = 0;
+  plan = 'Free';
+  referralCount = 0;
+  referralEarnings = 0;
+  mining = false;
   showHome();
 }
-
-loadUserData();
-if (isLoggedIn()) { showDashboard(); } else { showHome(); }
-fixPrice();
-updateUI();
-updateTimer();
-setInterval(updateTimer, 1000);
-setInterval(checkAutoMine, 30000);
-setInterval(updateDays, 60000);
-setInterval(fixPrice, 1000);
 function getUsers() {
   try { return JSON.parse(localStorage.getItem('nm_users') || '{}'); }
   catch(e) { return {}; }
