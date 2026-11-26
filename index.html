@@ -251,10 +251,10 @@ function userKey(key) {
 function getTodayKey() { return new Date().toISOString().slice(0,10); }
 function loadUserData() {
   currentEmail = localStorage.getItem('nm_current_user') || '';
-  balance = parseInt(localStorage.getItem(userKey('balance')) || localStorage.getItem('balance') || '0');
-  lastMine = parseInt(localStorage.getItem(userKey('lastMine')) || localStorage.getItem('lastMine') || '0');
-  plan = localStorage.getItem(userKey('plan')) || localStorage.getItem('plan') || 'Free';
-  mineAmount = parseInt(localStorage.getItem(userKey('mineAmount')) || localStorage.getItem('mineAmount') || '5');
+  balance = parseInt(localStorage.getItem(userKey('balance')) || '0');
+  lastMine = parseInt(localStorage.getItem(userKey('lastMine')) || '0');
+  plan = localStorage.getItem(userKey('plan')) || 'Free';
+  mineAmount = parseInt(localStorage.getItem(userKey('mineAmount')) || '5');
   referralCount = parseInt(localStorage.getItem(userKey('refCount')) || '0');
   referralEarnings = parseInt(localStorage.getItem(userKey('refEarnings')) || '0');
   try { tasksDone = JSON.parse(localStorage.getItem(userKey('tasksDone')) || '{}'); } catch (e) { tasksDone = {}; }
@@ -271,10 +271,6 @@ function saveUserData() {
   localStorage.setItem(userKey('refCount'), referralCount);
   localStorage.setItem(userKey('refEarnings'), referralEarnings);
   localStorage.setItem(userKey('tasksDone'), JSON.stringify(tasksDone));
-  localStorage.setItem('balance', balance);
-  localStorage.setItem('lastMine', lastMine);
-  localStorage.setItem('plan', plan);
-  localStorage.setItem('mineAmount', mineAmount);
 }
 
 // COMMAND: PRICE NEVER GOES BACK TO 0 AFTER 4 HOURS
