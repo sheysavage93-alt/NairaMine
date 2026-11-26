@@ -322,6 +322,14 @@ function signup() {
   if (!email || !email.includes('@')) { msg.innerText = '❌ Enter a valid email'; return; }
   if (!pass || pass.length < 4) { msg.innerText = '❌ Password must be at least 4 characters'; return; }
   let users = getUsers();
+
+  // FIX: DON'T OVERWRITE EXISTING ACCOUNT
+  if (users[email]) {
+    msg.innerText = '⚠️ This email already exists! Please Login instead, your balance is safe.';
+    alert('⚠️ This email already exists! Please press Login instead. Your balance was NOT deleted.');
+    return;
+  }
+
   users[email] = { name: name, email: email, password: pass, phone: phone, plan: 'Free', created: Date.now() };
   saveUsers(users);
   localStorage.setItem('nm_current_user', email);
