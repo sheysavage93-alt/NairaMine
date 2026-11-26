@@ -308,31 +308,12 @@ function toggleAuth() {
 }
 function showAuthTab(which) { if (which === 'login' && isSignupMode) toggleAuth(); if (which === 'signup' && !isSignupMode) toggleAuth(); }
 function showDashboard() {
-  if (!localStorage.getItem('nm_current_user')) { alert('Please create account / login first - Name, Email, Password.'); showAuth(); return; }
-  loadUserData();
-  checkAutoMine();
   document.getElementById('home').classList.add('hidden');
   document.getElementById('auth').classList.add('hidden');
   document.getElementById('dash').classList.remove('hidden');
-  document.getElementById('userName').innerText = localStorage.getItem('nm_current_name') || 'User';
-  updateUI();
-  updateTimer();
-  updateDays();
-  loadSavedAccount();
-  checkIncomingReferral();
-  refreshTaskButtons();
+  if (typeof updateUI === 'function') updateUI();
+  window.scrollTo(0,0);
 }
-function refreshTaskButtons() {
-  let tBtn = document.getElementById('btn_telegram');
-  let aBtn = document.getElementById('btn_ad');
-  if (tBtn && tasksDone['task_telegram']) { tBtn.innerText = 'Done ✓'; tBtn.disabled = true; }
-  if (aBtn && tasksDone['task_ad']) { aBtn.innerText = 'Done ✓'; aBtn.disabled = true; }
-}
-function openTelegram() { window.open(TELEGRAM_LINK, '_blank'); }
-function openAdsterra() { window.open(ADSTERRA_LINK, '_blank'); }
-function openWhatsApp(text) { window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text), '_blank'); }
-function getUsers() { try { return JSON.parse(localStorage.getItem('nm_users') || '{}'); } catch (e) { return {}; } }
-function saveUsers(u) { localStorage.setItem('nm_users', JSON.stringify(u)); }
 
 function signup() {
   let name = document.getElementById('name').value.trim();
@@ -347,14 +328,13 @@ function signup() {
   let users = getUsers();
   users[email] = { name: name, email: email, password: pass, phone: phone, plan: 'Free', created: Date.now() };
   saveUsers(users);
-  localStorage.setItem('nm_current_user', email.trim().toLowerCase());
-   currentEmail = email.trim().toLowerCase();
+  localStorage.setItem('nm_current_user', email);
   localStorage.setItem('nm_current_name', name);
-  currentEmail = email;
-  loadUserData();
-  plan = 'Free'; mineAmount = 5; balance = 0; lastMine = 0;
-  saveUserData();
-  document.getElementById('proofName').value = name;
+  try { currentEmail = email; } catch(e) {}
+  try { loadUserData(); } catch(e) {}
+  try { plan = 'Free'; mineAmount = 5; balance = 0; lastMine = 0; saveUserData(); } catch(e) {}
+  let proof = document.getElementById('proofName');
+  if (proof) proof.value = name;
   msg.innerText = '✅ Account created! Welcome ' + name;
   alert('✅ Welcome ' + name + '! Account created. You can now mine.');
   showDashboard();
@@ -371,13 +351,13 @@ function login() {
   if (user.password !== pass) { msg.innerText = '❌ Wrong password'; return; }
   localStorage.setItem('nm_current_user', email);
   localStorage.setItem('nm_current_name', user.name);
-  currentEmail = email;
-  document.getElementById('proofName').value = user.name;
+  try { currentEmail = email; } catch(e) {}
+  let proof = document.getElementById('proofName');
+  if (proof) proof.value = user.name;
   msg.innerText = '✅ Welcome back ' + user.name;
   alert('✅ Welcome back ' + user.name);
   showDashboard();
-}
-
+  }
 function isLoggedIn() { return !!localStorage.getItem('nm_current_user'); }
 
 function updateUI() {
