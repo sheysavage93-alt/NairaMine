@@ -214,8 +214,8 @@
 <div class="nav">
   <button onclick="showHome()">🏠 Home</button>
   <button onclick="showDashboard()">📊 Dashboard</button>
-  <button onclick="showDashboard()">⛏️ Mine</button>
-  <button onclick="showDashboard()">🏦 Withdraw</button>
+  <button onclick="showMine()">⛏️ Mine</button>
+  <button onclick="showWithdraw()">🏦 Withdraw</button>
 </div><script>
 const TELEGRAM_LINK = 'https://t.me/NairaMineUpdates';
 const ADSTERRA_LINK = 'https://araplhn.org/4/cb98cb8e497cb7eecc4dd44213d4b012';
@@ -709,6 +709,30 @@ setInterval(updateTimer, 1000);
 setInterval(checkAutoMine, 30000);
 setInterval(updateDays, 60000);
 setInterval(fixPrice, 1000);
+// === FIX ALL BUTTONS ===
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('nm_users') || '{}'); }
+  catch(e) { return {}; }
+}
+function saveUsers(u) {
+  localStorage.setItem('nm_users', JSON.stringify(u));
+}
+
+function showDashboard() {
+  showHome();
+}
+
+function showMine() {
+  showHome();
+  var m = document.getElementById('mineSection') || document.getElementById('mine') || document.getElementById('mining');
+  if (m) m.scrollIntoView({behavior:'smooth'});
+}
+
+function showWithdraw() {
+  showHome();
+  var w = document.getElementById('withdrawSection') || document.getElementById('withdraw') || document.getElementById('withdrawBox');
+  if (w) w.scrollIntoView({behavior:'smooth'});
+}
 </script>
 </body>
 </html>
