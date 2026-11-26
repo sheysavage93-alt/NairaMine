@@ -217,7 +217,7 @@
   <button onclick="showDashboard()">⛏️ Mine</button>
   <button onclick="showDashboard()">🏦 Withdraw</button>
 </div><script>
-const TELEGRAM_LINK = 'https://nairamine.onrender.com';
+const TELEGRAM_LINK = 'https://t.me/NairaMineUpdates';
 const ADSTERRA_LINK = 'https://araplhn.org/4/cb98cb8e497cb7eecc4dd44213d4b012';
 const WHATSAPP_NUMBER = '2349158978606';
 const ADMIN_PHONE_DISPLAY = '09158978606';
@@ -244,8 +244,8 @@ let referralCount = 0;
 let referralEarnings = 0;
 let tasksDone = {};
 
-function userKey(key) {
-  let e = currentEmail || localStorage.getItem('nm_current_user') || 'guest';
+function userKey(key) { 
+  let e = (currentEmail || localStorage.getItem('nm_current_user') || 'guest').toString().trim().toLowerCase();
   return key + '_' + e;
 }
 function getTodayKey() { return new Date().toISOString().slice(0,10); }
@@ -347,7 +347,8 @@ function signup() {
   let users = getUsers();
   users[email] = { name: name, email: email, password: pass, phone: phone, plan: 'Free', created: Date.now() };
   saveUsers(users);
-  localStorage.setItem('nm_current_user', email);
+  localStorage.setItem('nm_current_user', email.trim().toLowerCase());
+   currentEmail = email.trim().toLowerCase();
   localStorage.setItem('nm_current_name', name);
   currentEmail = email;
   loadUserData();
