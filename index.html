@@ -205,7 +205,7 @@
 
   <div class="card center">
     <h3>📞 Support</h3>
-    <p class="small">Phone / WhatsApp: 09158978606 | Telegram: @NairaMineOfficial</p>
+    <p class="small">Phone / WhatsApp: 09158978606 | Telegram: @NairaMineUpdates</p>
     <button onclick="openWhatsApp('Hello Admin, I need help')">Chat on WhatsApp</button>
     <button class="telegram" onclick="openTelegram()">Open Telegram</button>
   </div>
@@ -689,7 +689,6 @@ setInterval(updateTimer, 1000);
 setInterval(checkAutoMine, 30000);
 setInterval(updateDays, 60000);
 setInterval(fixPrice, 1000);
-// === FIX ALL BUTTONS ===
 function getUsers() {
   try { return JSON.parse(localStorage.getItem('nm_users') || '{}'); }
   catch(e) { return {}; }
@@ -697,22 +696,23 @@ function getUsers() {
 function saveUsers(u) {
   localStorage.setItem('nm_users', JSON.stringify(u));
 }
-
-function showDashboard() {
-  showHome();
+function openWhatsApp(msg) {
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
 }
-
+function openTelegram() {
+  window.open(TELEGRAM_LINK, '_blank');
+}
+function openAdsterra() {
+  window.open(ADSTERRA_LINK, '_blank');
+}
 function showMine() {
-  showHome();
-  var m = document.getElementById('mineSection') || document.getElementById('mine') || document.getElementById('mining');
-  if (m) m.scrollIntoView({behavior:'smooth'});
+  showDashboard();
+  window.scrollTo(0,0);
 }
-
 function showWithdraw() {
-  showHome();
-  var w = document.getElementById('withdrawSection') || document.getElementById('withdraw') || document.getElementById('withdrawBox');
-  if (w) w.scrollIntoView({behavior:'smooth'});
-}
+  showDashboard();
+  window.scrollTo(0,0);
+  }
 </script>
 </body>
 </html>
